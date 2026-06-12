@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>City Road Research | Two-Tier Risk Management Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+
+    :root{
+      --paper:#F4F2EC;
+      --paper-2:#FBFAF6;
+      --card:#FCFBF8;
+      --ink:#16202E;
+      --ink-2:#27313F;
+      --text:#3C4450;
+      --muted:#717A86;
+      --faint:#9AA1AB;
+      --line:rgba(22,32,46,0.14);
+      --line-soft:rgba(22,32,46,0.07);
+      --accent:#2E5AAC;
+      --accent-deep:#1E3E7B;
+      --accent-soft:rgba(46,90,172,0.08);
+      --cream:#EDEAE0;
+      --cream-mute:#AFB6BF;
+      --gold:#B5893D;
+      --pos:#3F8765;
+      --neg:#B14B3A;
+
+      /* Compatibility aliases used by the existing dashboard logic */
+      --bg-base:var(--paper);
+      --bg-surface:var(--paper);
+      --bg-card:var(--card);
+      --bg-card-soft:rgba(252,251,248,0.72);
+      --border-light:var(--line);
+      --border-soft:var(--line-soft);
+      --text-primary:var(--ink);
+      --text-secondary:var(--muted);
+      --text-muted:var(--faint);
+      --accent-blue:var(--accent);
+      --accent-blue-light:#3E68B1;
+      --accent-glow:rgba(46,90,172,0.14);
+      --tier1:var(--accent);
+      --tier1-glow:rgba(46,90,172,0.18);
+      --tier2:var(--gold);
+      --tier2-glow:rgba(181,137,61,0.18);
+      --danger:var(--neg);
+      --danger-glow:rgba(177,75,58,0.18);
+      --success:var(--pos);
+      --success-glow:rgba(63,135,101,0.18);
+      --warning:var(--gold);
+      --warning-glow:rgba(181,137,61,0.18);
+
+      --serif:'Fraunces',Georgia,serif;
+      --sans:'Inter',system-ui,sans-serif;
+      --mono:'IBM Plex Mono',monospace;
+      --font-main:var(--sans);
+      --font-mono:var(--mono);
+    }
+
+    *{ box-sizing:border-box; }
+
+    html,body{ margin:0; padding:0; }
+
+    body{
+      font-family:var(--sans);
+      color:var(--text);
+      background:radial-gradient(120% 120% at 50% 0%,#E7E4DB 0%,#DBD8CF 100%);
+      margin:0;
+      padding:28px 32px 40px;
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      min-height:100vh;
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+    }
+
+    h1,h2,h3{ margin-top:0; letter-spacing:-0.02em; }
+    h1{
+      font-family:var(--serif);
+      font-size:1.62rem;
+      line-height:1.12;
+      font-weight:600;
+      color:var(--ink);
+      margin-bottom:5px;
+    }
+    h2{
+      font-family:var(--mono);
+      font-size:0.78rem;
+      letter-spacing:0.20em;
+      text-transform:uppercase;
+      color:var(--accent);
+      border-bottom:1px solid var(--line);
+      padding-bottom:12px;
+      margin-bottom:18px;
+      font-weight:600;
+    }
+    h2::before{
+      content:"";
+      display:inline-block;
+      width:14px;
+      height:1px;
+      background:var(--accent);
+      vertical-align:middle;
+      margin-right:8px;
+    }
+    h3{
+      font-family:var(--serif);
+      font-size:1.16rem;
+      line-height:1.2;
+      font-weight:600;
+      color:var(--ink);
+      margin-bottom:14px;
+    }
+    p{ color:var(--muted); font-size:0.92rem; margin:0 0 16px; }
+    strong{ color:var(--ink); font-weight:600; }
+
+    /* Header matched to the City Road infrastructure-map visual system */
+    .header-container{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:24px;
+      margin-bottom:18px;
+      padding:22px 28px;
+      background:var(--paper);
+      border-radius:6px;
+      border:1px solid var(--line);
+      box-shadow:0 8px 24px rgba(20,26,36,0.08);
+      flex-shrink:0;
+    }
+
+    .brand-row{ display:flex; align-items:center; gap:14px; }
+    .brand-mark{ width:34px; height:34px; position:relative; flex:0 0 auto; }
+    .brand-mark::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border:2px solid var(--ink);
+      transform:rotate(45deg);
+      border-radius:4px;
+    }
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      inset:30%;
+      background:var(--accent);
+      transform:rotate(45deg);
+      border-radius:1px;
+      box-shadow:0 0 14px rgba(46,90,172,0.4);
+    }
+    .brand-text{ display:flex; flex-direction:column; line-height:1.1; }
+    .brand-name{
+      font-family:var(--serif);
+      font-weight:600;
+      font-size:1.35rem;
+      color:var(--ink);
+      letter-spacing:0.01em;
+      margin:0;
+      line-height:1.08;
+    }
+    .brand-name em{ font-style:normal; color:var(--muted); font-weight:400; }
+    .header-sub{
+      margin:3px 0 0;
+      font-family:var(--mono);
+      font-size:0.68rem;
+      letter-spacing:0.22em;
+      text-transform:uppercase;
+      color:var(--faint);
+      line-height:1.25;
+    }
+    .confidence-cluster{ display:flex; align-items:center; gap:10px; }
+    .mode-pill,
+    .confidence-meter{
+      min-height:34px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:6px 12px;
+      border-radius:30px;
+      background:var(--paper-2);
+      border:1px solid var(--line);
+      color:var(--muted);
+      font-family:var(--mono);
+      font-size:0.70rem;
+      letter-spacing:0.14em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .mode-pill::before{
+      content:"";
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:var(--accent);
+      opacity:.45;
+      box-shadow:0 0 0 3px rgba(46,90,172,0.08);
+    }
+    .confidence-meter::before{
+      content:"\f3ed";
+      font-family:"Font Awesome 6 Free";
+      font-weight:900;
+      color:var(--accent);
+      letter-spacing:0;
+      font-size:0.78rem;
+    }
+    .confidence-label{
+      font-family:var(--mono);
+      font-size:0.68rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:0.14em;
+      margin:0;
+    }
+    .score-display{
+      font-family:var(--mono);
+      font-size:0.74rem;
+      font-weight:600;
+      color:var(--accent);
+      font-variant-numeric:tabular-nums;
+      line-height:1;
+      text-shadow:none;
+      letter-spacing:0.08em;
+    }
+
+    .tabs{
+      display:flex;
+      gap:4px;
+      margin-bottom:18px;
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius:6px;
+      padding:4px;
+      overflow-x:auto;
+      flex-shrink:0;
+      box-shadow:0 6px 18px rgba(20,26,36,0.05);
+    }
+    .tab-btn{
+      background:none;
+      color:var(--muted);
+      border:none;
+      padding:12px 13px;
+      cursor:pointer;
+      border-radius:4px;
+      font-family:var(--sans);
+      font-size:0.82rem;
+      font-weight:500;
+      transition:all .18s;
+      white-space:nowrap;
+    }
+    .tab-btn:hover{ color:var(--ink); background:var(--paper-2); }
+    .tab-btn.active{
+      background:var(--ink);
+      color:var(--cream);
+      box-shadow:none;
+    }
+
+    .tab-content{
+      display:none;
+      flex:1;
+      min-height:0;
+      overflow-y:auto;
+      padding-right:6px;
+    }
+    .tab-content.active{ display:block; animation:fadeIn .25s ease; }
+    @keyframes fadeIn{ from{ opacity:0; transform:translateY(5px);} to{ opacity:1; transform:translateY(0);} }
+
+    .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+
+    .card{
+      background:var(--paper);
+      padding:22px 24px;
+      border-radius:6px;
+      border:1px solid var(--line);
+      box-shadow:0 6px 18px rgba(20,26,36,0.05);
+      backdrop-filter:none;
+    }
+    .card.tight{ padding:16px 18px; }
+    .card.tier1{
+      border-color:rgba(46,90,172,0.35);
+      background:linear-gradient(180deg,rgba(46,90,172,0.05) 0%,var(--paper) 42%);
+      box-shadow:0 10px 26px rgba(46,90,172,0.06);
+    }
+    .card.tier2{
+      border-color:rgba(181,137,61,0.38);
+      background:linear-gradient(180deg,rgba(181,137,61,0.07) 0%,var(--paper) 42%);
+      box-shadow:0 10px 26px rgba(181,137,61,0.06);
+    }
+
+    .metric-row{ display:flex; gap:14px; margin-bottom:18px; flex-wrap:wrap; }
+    .metric-box{
+      flex:1;
+      min-width:190px;
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius:6px;
+      padding:17px 18px;
+      text-align:center;
+      box-shadow:0 6px 18px rgba(20,26,36,0.05);
+    }
+    .metric-title{
+      font-family:var(--mono);
+      font-size:0.66rem;
+      color:var(--muted);
+      text-transform:uppercase;
+      font-weight:500;
+      letter-spacing:0.14em;
+      margin-bottom:9px;
+    }
+    .metric-val{
+      font-family:var(--serif);
+      font-size:2.05rem;
+      font-weight:600;
+      line-height:1;
+      color:var(--ink);
+    }
+    .metric-sub{ margin-top:8px; font-size:0.76rem; color:var(--faint); }
+
+    .val-success{ color:var(--pos); text-shadow:none; }
+    .val-danger{ color:var(--neg); text-shadow:none; }
+    .val-warning{ color:var(--gold); text-shadow:none; }
+    .val-tier1{ color:var(--accent); text-shadow:none; }
+    .val-tier2{ color:var(--gold); text-shadow:none; }
+    .val-neutral{ color:var(--ink); }
+
+    .stack-bar{
+      display:flex;
+      height:58px;
+      border-radius:6px;
+      overflow:hidden;
+      margin:18px 0 22px;
+      border:1px solid var(--line);
+      background:var(--paper-2);
+    }
+    .stack-segment{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      font-weight:600;
+      color:#fff;
+      transition:all .45s cubic-bezier(.4,0,.2,1);
+      font-family:var(--mono);
+      font-size:0.78rem;
+      white-space:nowrap;
+      overflow:hidden;
+      min-width:0;
+    }
+    .stack-segment small{ color:rgba(255,255,255,.72); font-size:0.66rem; text-transform:uppercase; letter-spacing:0.10em; }
+
+    .slider-group{ margin-bottom:18px; }
+    .slider-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; gap:10px; }
+    .slider-header label{
+      font-family:var(--mono);
+      font-size:0.68rem;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin:0;
+      font-weight:500;
+    }
+    .val-badge{
+      background:var(--paper-2);
+      padding:4px 11px;
+      border-radius:30px;
+      font-size:0.75rem;
+      font-family:var(--mono);
+      color:var(--accent);
+      border:1px solid var(--line);
+      white-space:nowrap;
+    }
+
+    input[type=range]{ -webkit-appearance:none; width:100%; background:transparent; margin:9px 0; }
+    input[type=range]:focus{ outline:none; }
+    input[type=range]::-webkit-slider-runnable-track{ width:100%; height:3px; cursor:pointer; background:var(--line); border-radius:3px; }
+    input[type=range]::-webkit-slider-thumb{ height:15px; width:15px; border-radius:50%; background:var(--accent); cursor:pointer; -webkit-appearance:none; margin-top:-6px; box-shadow:0 0 0 4px rgba(46,90,172,0.12); }
+    input[type=range]::-moz-range-track{ width:100%; height:3px; cursor:pointer; background:var(--line); border-radius:3px; }
+    input[type=range]::-moz-range-thumb{ height:15px; width:15px; border:none; border-radius:50%; background:var(--accent); cursor:pointer; box-shadow:0 0 0 4px rgba(46,90,172,0.12); }
+
+    .status-dot{ width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:8px; flex:0 0 auto; vertical-align:middle; }
+    .bg-success{ background-color:var(--pos); box-shadow:0 0 8px rgba(63,135,101,.28); }
+    .bg-danger{ background-color:var(--neg); box-shadow:0 0 8px rgba(177,75,58,.28); }
+    .bg-warning{ background-color:var(--gold); box-shadow:0 0 8px rgba(181,137,61,.25); }
+    .bg-tier1{ background-color:var(--accent); box-shadow:0 0 8px rgba(46,90,172,.28); }
+    .bg-tier2{ background-color:var(--gold); box-shadow:0 0 8px rgba(181,137,61,.25); }
+
+    table{ width:100%; border-collapse:collapse; font-size:0.88rem; }
+    th,td{ padding:12px 14px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; color:var(--text); }
+    th{
+      font-family:var(--mono);
+      color:var(--muted);
+      font-weight:500;
+      font-size:0.68rem;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+      background:var(--paper-2);
+    }
+    tr:hover{ background-color:rgba(46,90,172,0.035); }
+    td:first-child{ color:var(--ink); }
+
+    .risk-item{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px 0;
+      border-bottom:1px solid var(--line);
+    }
+    .risk-item:last-child{ border-bottom:none; }
+    .risk-item strong{ display:block; margin-bottom:2px; font-family:var(--serif); font-size:1.02rem; color:var(--ink); }
+    .risk-item span{ color:var(--muted); font-size:0.84rem; }
+
+    .gate-layer{
+      border-radius:6px;
+      padding:12px 14px;
+      font-family:var(--mono);
+      font-weight:600;
+      font-size:0.78rem;
+      color:#fff;
+      text-align:center;
+      transition:background .25s ease, transform .25s ease;
+      letter-spacing:0.05em;
+    }
+    .gate-arrow{ text-align:center; color:var(--faint); line-height:1; margin:7px 0; }
+    .gate-result{
+      text-align:center;
+      margin-top:18px;
+      padding:14px;
+      border:1px dashed var(--line);
+      border-radius:6px;
+      font-family:var(--mono);
+      font-weight:600;
+      color:var(--ink);
+      background:var(--paper-2);
+    }
+
+    .pill-row{ display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 18px; }
+    .select-pill,.scenario-btn{
+      background:var(--paper);
+      border:1px solid var(--line);
+      color:var(--muted);
+      padding:9px 13px;
+      border-radius:5px;
+      cursor:pointer;
+      font-family:var(--sans);
+      font-weight:500;
+      transition:all .18s;
+      font-size:.84rem;
+    }
+    .select-pill:hover,.scenario-btn:hover{ background:var(--paper-2); color:var(--ink); }
+    .select-pill.active,.scenario-btn.active{
+      border-color:var(--ink);
+      background:var(--ink);
+      color:var(--cream);
+    }
+    .scenario-btn.danger{ border-color:rgba(177,75,58,.45); }
+    .scenario-btn.danger.active{ border-color:var(--neg); background:var(--neg); color:#fff; }
+    .scenario-btn.tier2.active{ border-color:var(--gold); background:var(--gold); color:#fff; }
+
+    .timeline{ border-left:2px solid var(--line); margin-left:19px; padding-left:24px; display:flex; flex-direction:column; gap:14px; }
+    .step{
+      position:relative;
+      opacity:.55;
+      transition:all .25s;
+      padding:12px;
+      border-radius:6px;
+      border:1px solid transparent;
+      cursor:pointer;
+      background:transparent;
+    }
+    .step::before{
+      content:"";
+      position:absolute;
+      left:-31px;
+      top:16px;
+      width:11px;
+      height:11px;
+      border-radius:50%;
+      background:var(--line);
+      border:2px solid var(--paper);
+      transition:all .25s;
+    }
+    .step.active{
+      opacity:1;
+      border-color:rgba(46,90,172,.45);
+      background:rgba(46,90,172,.055);
+    }
+    .step.active::before{ background:var(--accent); box-shadow:0 0 8px rgba(46,90,172,.32); }
+    .step.completed{ opacity:1; }
+    .step.completed::before{ background:var(--pos); }
+
+    .progress-row{ margin-bottom:18px; }
+    .progress-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:8px; gap:12px; }
+    .progress-label{ font-weight:600; color:var(--ink); font-family:var(--serif); }
+    .progress-val{ font-size:.88rem; color:var(--muted); font-family:var(--mono); }
+    .track{ width:100%; height:8px; background:var(--line); border-radius:5px; overflow:hidden; }
+    .fill{ height:100%; transition:width .35s ease, background .35s ease; border-radius:5px; }
+
+    .log-container{
+      background:var(--ink);
+      border:1px solid var(--line);
+      border-radius:6px;
+      padding:16px 18px;
+      height:270px;
+      overflow-y:auto;
+      font-family:var(--mono);
+      font-size:0.76rem;
+      line-height:1.6;
+      color:var(--cream);
+    }
+    .log-time{ color:#5C6B82; margin-right:10px; }
+
+    button.action-btn{
+      background:var(--accent);
+      color:#fff;
+      border:none;
+      padding:11px 20px;
+      border-radius:5px;
+      cursor:pointer;
+      font-family:var(--sans);
+      font-size:0.90rem;
+      font-weight:600;
+      transition:all .18s;
+      width:100%;
+    }
+    button.action-btn:hover{ background:var(--accent-deep); transform:translateY(-1px); }
+    button.action-btn:disabled{ background:var(--line); color:var(--muted); cursor:not-allowed; transform:none; }
+
+    .note{
+      background:var(--paper-2);
+      border:1px solid var(--line);
+      border-radius:6px;
+      padding:13px 15px;
+      color:var(--muted);
+      font-size:.86rem;
+    }
+
+    ::-webkit-scrollbar{ width:7px; height:7px; }
+    ::-webkit-scrollbar-track{ background:transparent; }
+    ::-webkit-scrollbar-thumb{ background:rgba(22,32,46,0.16); border-radius:4px; }
+    ::-webkit-scrollbar-thumb:hover{ background:var(--accent); }
+    .log-container::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.18); }
+
+    /* Additional typography pass to match the attached City Road map */
+    .tabs{ padding:4px; }
+    .tab-btn{
+      font-family:var(--sans);
+      font-weight:500;
+      letter-spacing:0;
+      min-height:48px;
+    }
+    .metric-val,.metric-num,.mcr-kpi-val,.score-display,.val-badge,.mcr-metric-val{
+      font-family:var(--mono);
+      font-variant-numeric:tabular-nums;
+    }
+    .metric-lbl,.mcr-kpi-title,.slider-header label,th{
+      font-family:var(--mono);
+      letter-spacing:0.14em;
+      text-transform:uppercase;
+    }
+    td, p, li, .risk-content p, .risk-item span, .mcr-metric-label, .mcr-log-container{
+      font-family:var(--sans);
+    }
+    table td{ font-size:0.92rem; }
+    .card h3{ font-family:var(--serif); }
+
+    @media(max-width:980px){
+      body{ overflow-y:auto; height:auto; padding:20px; }
+      .grid-2,.grid-3,.grid-4{ grid-template-columns:1fr; }
+      .tab-content{ overflow:visible; }
+      .header-container{ flex-direction:column; align-items:flex-start; }
+      .confidence-cluster{ width:100%; justify-content:space-between; }
+    }
+    @media(max-width:680px){
+      body{ padding:16px; }
+      .confidence-cluster{ flex-direction:column; align-items:flex-start; gap:10px; }
+      .tabs{ flex-wrap:wrap; }
+      .tab-btn{ flex:1 1 45%; }
+    }
+
+  </style>
+</head>
+<body>
+  <header class="header-container">
+    <div class="brand-row">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="brand-name">City Road <em>Research</em></div>
+        <div class="header-sub">Risk &amp; Capital Preservation Dashboard</div>
+      </div>
+    </div>
+    <div class="confidence-cluster">
+      <div class="mode-pill" id="mode-pill">Risk-gated deployment</div>
+      <div class="confidence-meter">
+        <span class="confidence-label">Portfolio confidence</span>
+        <span class="score-display" id="global-score">100%</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn" id="btn-tab-capital" onclick="openTab('tab-capital')">1. Capital Stack</button>
+    <button class="tab-btn" id="btn-tab-tiers" onclick="openTab('tab-tiers')">2. Tier Architecture</button>
+    <button class="tab-btn" id="btn-tab-killswitch" onclick="openTab('tab-killswitch')">3. Kill-Switches</button>
+    <button class="tab-btn" id="btn-tab-multisig" onclick="openTab('tab-multisig')">4. Treasury Multi-Sig</button>
+    <button class="tab-btn" id="btn-tab-pipeline" onclick="openTab('tab-pipeline')">5. Deployment Pipeline</button>
+    <button class="tab-btn" id="btn-tab-gauntlet" onclick="openTab('tab-gauntlet')">6. Pre-Trade Gate</button>
+    <button class="tab-btn" id="btn-tab-tier1" onclick="openTab('tab-tier1')">7. Tier 1 Controls</button>
+    <button class="tab-btn" id="btn-tab-tier2" onclick="openTab('tab-tier2')">8. Tier 2 Controls</button>
+    <button class="tab-btn active" id="btn-tab-master" onclick="openTab('tab-master')">9. Live Control Room</button>
+  </div>
+
+  <div id="tab-capital" class="tab-content">
+    <h2>Portfolio Capital Stack</h2>
+    <p>Initial trading programme structure from the latest model: <strong>$250,000 active trading capital</strong> with a separate <strong>$150,000 trading reserve</strong>. Operating runway and team / infrastructure spend sit outside the automated trading envelope.</p>
+    <div class="stack-bar">
+      <div id="bar-active" class="stack-segment" style="width: 62.5%; background:var(--accent-blue);"><small>Active trading capital</small><span id="amt-active">$250,000</span></div>
+      <div id="bar-reserve" class="stack-segment" style="width: 37.5%; background:var(--ink);"><small>Trading reserve</small><span id="amt-reserve">$150,000</span></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Allocation Logic</h3>
+        <table>
+          <thead><tr><th>Bucket</th><th>Purpose</th><th>Initial state</th></tr></thead>
+          <tbody>
+            <tr><td><span class="status-dot bg-tier1"></span>Active trading capital</td><td>Capital available for approved Tier 1 market-making first, with Tier 2 only inside validated strategy caps.</td><td>$250k</td></tr>
+            <tr><td><span class="status-dot bg-success"></span>Trading reserve</td><td>Protected liquidity buffer used for drawdown defence, settlement needs and staged top-ups.</td><td>$150k</td></tr>
+            <tr><td><span class="status-dot bg-warning"></span>Tier 2 sub-caps</td><td>Not a separate funded pot. Tier 2 uses the active trading envelope only after validation and confidence gates.</td><td>Gated / capped</td></tr>
+            <tr><td><span class="status-dot bg-success"></span>Operating runway</td><td>Payroll, admin, legal and infrastructure are funded separately and should not be confused with trading capital.</td><td>Outside trading stack</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Recycling / Scale-Up Logic</h3>
+        <table>
+          <thead><tr><th>Stage</th><th>Trading capital</th><th>Condition</th></tr></thead>
+          <tbody>
+            <tr><td>Initial launch</td><td>$250k</td><td>Modelled starting active trading capital.</td></tr>
+            <tr><td>Validated scale-up</td><td>$500k</td><td>Only after live evidence, controlled drawdown and cashflow support.</td></tr>
+            <tr><td>Mature capacity</td><td>$750k</td><td>Recycled cashflow / validated performance expands the trading envelope.</td></tr>
+          </tbody>
+        </table>
+        <div class="slider-group" style="margin-top:22px;">
+          <div class="slider-header"><label>Simulated stress / drawdown trigger</label><span class="val-badge" id="drawdown-val-badge">0.0%</span></div>
+          <input type="range" id="drawdown-slider" min="0" max="25" step="0.5" value="0" oninput="updateCapitalStack()" />
+        </div>
+        <div class="slider-group">
+          <div class="slider-header"><label>Tier 2 signal confidence haircut</label><span class="val-badge" id="signal-haircut-badge">0%</span></div>
+          <input type="range" id="signal-haircut-slider" min="0" max="100" step="5" value="0" oninput="updateCapitalStack()" />
+        </div>
+        <div class="note"><span class="status-dot bg-success" id="drawdown-dot"></span><span id="drawdown-msg">Normal conditions. $250k active trading capital available; $150k reserve protected.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-tiers" class="tab-content">
+    <h2>Two-Tier Risk Architecture</h2>
+    <p>City Road does not treat market making and alpha strategies as separate businesses. They share the same data spine, execution gateways, risk engine, capital allocation process, kill-switches, custody controls and governance framework.</p>
+    <div class="grid-2">
+      <div class="card tier1">
+        <h3><span class="status-dot bg-tier1"></span>Tier 1 · Market Making & Liquidity Provision</h3>
+        <p>Strategies that seek to earn net spread, rebates, funding or liquidity incentives by quoting selected markets where risk-adjusted economics are attractive.</p>
+        <table>
+          <tbody>
+            <tr><td>Primary risks</td><td>Inventory build-up, adverse selection, stale data, execution failure, latency, volatility shocks.</td></tr>
+            <tr><td>Controls</td><td>Inventory caps, quote widening, liquidity pull, post-fill markouts, data freshness gates.</td></tr>
+            <tr><td>Scaling rule</td><td>Scale only where spread / rebate / funding economics compensate for risk and slippage.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card tier2">
+        <h3><span class="status-dot bg-tier2"></span>Tier 2 · Proprietary Alpha Strategies</h3>
+        <p>Strategies that seek to capture mispricings from cross-venue price discovery, sports/event modelling, RWA dislocations, flow classification and research signals.</p>
+        <table>
+          <tbody>
+            <tr><td>Primary risks</td><td>Model error, overfitting, stale edge, directional exposure, event risk, signal decay, correlation.</td></tr>
+            <tr><td>Controls</td><td>Out-of-sample testing, shadow mode, micro-live validation, event caps, edge decay limits.</td></tr>
+            <tr><td>Scaling rule</td><td>No material capital until live evidence proves data quality, execution quality and repeatable edge.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card" style="margin-top:22px;">
+      <h3>Cross-Tier Exposure Aggregation</h3>
+      <table>
+        <thead><tr><th>Shared Risk</th><th>Example</th><th>Portfolio Response</th></tr></thead>
+        <tbody>
+          <tr><td>Same event</td><td>Tier 1 quoting an NFL market while Tier 2 carries a sports-model position on the same game.</td><td>Aggregate exposure; reduce new size or require manual approval.</td></tr>
+          <tr><td>Same venue</td><td>Market making and alpha both active on the same prediction-market venue.</td><td>Apply combined venue cap and settlement-window cap.</td></tr>
+          <tr><td>Same reference price</td><td>RWA dislocation strategy and MM both depend on the same oil/gold reference feed.</td><td>Require multi-source reference validation or defensive mode.</td></tr>
+          <tr><td>Correlated signals</td><td>Price-lag, wallet-flow and sports-model signals point to the same exposure.</td><td>Apply correlation haircut and consolidated drawdown limit.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-killswitch" class="tab-content">
+    <h2>Portfolio, Tier and Venue Kill-Switches</h2>
+    <p>Execution limits freeze or reduce activity without waiting for human reaction. The same kill-switch layer can stop a venue, strategy, tier or the whole portfolio.</p>
+    <div class="grid-2">
+      <div class="card tight">
+        <div class="risk-item" id="card-ks-1"><div><strong>Portfolio drawdown limit</strong><span>Hard stop when daily / weekly loss thresholds are breached.</span></div><span class="status-dot bg-success" id="ks-1"></span></div>
+        <div class="risk-item" id="card-ks-2"><div><strong>Venue/API instability</strong><span>Cancel resting orders and halt venue on degraded acknowledgements or stale state.</span></div><span class="status-dot bg-success" id="ks-2"></span></div>
+        <div class="risk-item" id="card-ks-3"><div><strong>Tier 1 adverse selection</strong><span>Widen, reduce size or stop quoting if post-fill markouts turn negative.</span></div><span class="status-dot bg-success" id="ks-3"></span></div>
+        <div class="risk-item" id="card-ks-4"><div><strong>Tier 2 model decay</strong><span>Disable alpha strategy if live markouts diverge from expected edge.</span></div><span class="status-dot bg-success" id="ks-4"></span></div>
+      </div>
+      <div class="card">
+        <h3>Live Trigger Controls</h3>
+        <div class="slider-group"><div class="slider-header"><label>Portfolio drawdown</label><span class="val-badge" id="ks-dd-val">1.0%</span></div><input type="range" id="ks-dd-slider" min="0" max="15" step="0.5" value="1" oninput="updateKillSwitches()"></div>
+        <div class="slider-group"><div class="slider-header"><label>API roundtrip latency</label><span class="val-badge" id="api-val">80 ms</span></div><input type="range" id="api-slider" min="10" max="1500" value="80" step="10" oninput="updateKillSwitches()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Tier 1 toxicity score</label><span class="val-badge" id="tox-ks-val">15 / 100</span></div><input type="range" id="tox-ks-slider" min="0" max="100" value="15" oninput="updateKillSwitches()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Tier 2 realised / expected edge gap</label><span class="val-badge" id="edge-gap-val">0 bps</span></div><input type="range" id="edge-gap-slider" min="0" max="40" value="0" oninput="updateKillSwitches()"></div>
+        <div class="note"><span id="ks-msg" style="font-weight:800;color:var(--success);">System risk gates normal. Strategy activity permitted inside approved caps.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-multisig" class="tab-content">
+    <h2>Treasury Multi-Sig Governance</h2>
+    <p>Trading systems cannot unilaterally move material treasury funds. Treasury, operating capital, Tier 1 risk capital and Tier 2 risk capital remain segregated.</p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Approval Stage Track</h3>
+        <div class="timeline">
+          <div class="step active" id="ms-1"><strong>1. Transfer proposal</strong><p>Destination wallet / venue account must match internal whitelist. Status: unsigned.</p></div>
+          <div class="step" id="ms-2"><strong>2. Strategy and tier check</strong><p>Transfer amount must fit approved Tier 1, Tier 2 or experimental capital cap.</p></div>
+          <div class="step" id="ms-3"><strong>3. Hardware key quorum</strong><p>2-of-3 signer threshold required for material treasury movement.</p></div>
+          <div class="step" id="ms-4"><strong>4. Time-lock / veto window</strong><p>Time-lock allows manual intervention before transfer finalisation.</p><div id="timelock-display" style="display:none;font-family:var(--font-mono);font-size:1.1rem;color:var(--warning);border:1px solid var(--border-light);padding:2px 8px;border-radius:4px;margin-top:6px;">23:59:59</div></div>
+          <div class="step" id="ms-5"><strong>5. Segregated trading account</strong><p>Funds land in trade-only accounts with restricted withdrawal permissions.</p></div>
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <h3>Hardware Key Matrix</h3>
+          <div style="display:flex;justify-content:center;gap:15px;margin:28px 0;">
+            <div style="background:var(--bg-card);border:2px solid var(--border-light);border-radius:8px;padding:14px;text-align:center;width:82px;" id="key-1"><span style="font-size:.75rem;font-weight:800;color:var(--text-secondary);">Key 1</span></div>
+            <div style="background:var(--bg-card);border:2px solid var(--border-light);border-radius:8px;padding:14px;text-align:center;width:82px;" id="key-2"><span style="font-size:.75rem;font-weight:800;color:var(--text-secondary);">Key 2</span></div>
+            <div style="background:var(--bg-card);border:2px solid var(--border-light);border-radius:8px;padding:14px;text-align:center;width:82px;opacity:.5;" id="key-3"><span style="font-size:.75rem;font-weight:800;color:var(--text-secondary);">Key 3</span></div>
+          </div>
+          <div style="text-align:center;margin:20px 0;"><span style="font-size:3rem;font-weight:850;font-family:var(--font-mono);color:var(--text-primary);" id="quorum-ratio">0/2</span><span style="color:var(--text-secondary);display:block;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;">Confirmed Signatures</span></div>
+        </div>
+        <div>
+          <div class="note" style="text-align:center;margin-bottom:18px;" id="ms-msg">Awaiting proposal initiation...</div>
+          <button class="action-btn" id="ms-btn" onclick="advanceMultiSig()">Initiate Transfer Proposal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-pipeline" class="tab-content">
+    <h2>Strategy Deployment Pipeline</h2>
+    <p>No model moves directly from backtest to meaningful capital deployment. Tier 1 and Tier 2 strategies must prove data quality, execution quality, controlled loss behaviour and repeatable edge.</p>
+    <div class="grid-2">
+      <div class="card">
+        <div class="timeline">
+          <div class="step active" onclick="setPipeline(0, this)"><strong>1. Research / simulation</strong><p>Historical analysis, out-of-sample testing, cost assumptions, hypothesis clarity.</p></div>
+          <div class="step" onclick="setPipeline(1, this)"><strong>2. Live shadow mode</strong><p>Real market data, no capital. Records signals, quotes, expected fills and markouts.</p></div>
+          <div class="step" onclick="setPipeline(2, this)"><strong>3. Micro-live testing</strong><p>Very small capital to test execution, latency, fills, settlement and controls.</p></div>
+          <div class="step" onclick="setPipeline(3, this)"><strong>4. Limited deployment</strong><p>Strict strategy, venue and drawdown caps. Manual review after each cycle.</p></div>
+          <div class="step" onclick="setPipeline(4, this)"><strong>5. Scaled deployment</strong><p>Capital increases only after performance, risk, cashflow recycling and operational controls are validated.</p></div>
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <h3 style="width:100%;text-align:center;border-bottom:1px solid var(--border-light);padding-bottom:12px;">Active Capital Limit by Stage</h3>
+        <div style="width:80%;height:210px;background:var(--bg-base);border-radius:5px;position:relative;border-bottom:2px solid var(--border-light);margin-top:18px;">
+          <div id="alloc-fill" style="position:absolute;bottom:0;width:100%;background:var(--accent-blue);height:0%;transition:height .35s ease;border-radius:5px 5px 0 0;"></div>
+        </div>
+        <h2 id="alloc-text" style="margin-top:22px;font-family:var(--font-mono);font-size:2.4rem;color:var(--text-primary);">$0</h2>
+        <p id="alloc-caption" style="text-align:center;max-width:420px;">Research only. No trading capital permitted.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-gauntlet" class="tab-content">
+    <h2>Pre-Trade Risk Gate</h2>
+    <p>Each order candidate must pass data, liquidity, expected-edge and strategy-specific checks before execution. Tier 2 strategies add model and event-risk gates on top of standard venue controls.</p>
+    <div class="pill-row">
+      <button class="select-pill active" id="gate-mode-tier1" onclick="setGateMode('tier1')">Tier 1 · Market Making</button>
+      <button class="select-pill" id="gate-mode-tier2" onclick="setGateMode('tier2')">Tier 2 · Proprietary Alpha</button>
+    </div>
+    <div class="grid-2">
+      <div class="card" style="display:flex;flex-direction:column;gap:0;">
+        <div class="gate-layer" id="g-0" style="background:var(--success);">Layer 0: Data Freshness / Latency Validated</div><div class="gate-arrow">⬇</div>
+        <div class="gate-layer" id="g-1" style="background:var(--success);">Layer 1: Expected Net Edge Positive</div><div class="gate-arrow">⬇</div>
+        <div class="gate-layer" id="g-2" style="background:var(--success);">Layer 2: Adverse Selection / Liquidity Check</div><div class="gate-arrow">⬇</div>
+        <div class="gate-layer" id="g-3" style="background:var(--success);">Layer 3: Strategy-Specific Risk Gate</div>
+        <div class="gate-result" id="g-result" style="color:var(--success);">RISK GATE PASSED</div>
+      </div>
+      <div class="card">
+        <h3>Risk Parameter Injector</h3>
+        <div class="slider-group"><div class="slider-header"><label>Data freshness / latency</label><span class="val-badge" id="g-lat-val">20 ms</span></div><input type="range" id="g-lat" min="1" max="300" value="20" oninput="updateGauntlet()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Expected net edge after costs</label><span class="val-badge" id="g-edge-val">6 bps</span></div><input type="range" id="g-edge" min="-10" max="40" value="6" oninput="updateGauntlet()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Adverse selection / liquidity risk</label><span class="val-badge" id="g-tox-val">20 / 100</span></div><input type="range" id="g-tox" min="0" max="100" value="20" oninput="updateGauntlet()"></div>
+        <div class="slider-group"><div class="slider-header"><label id="g-special-label">Inventory concentration</label><span class="val-badge" id="g-special-val">20%</span></div><input type="range" id="g-special" min="0" max="100" value="20" oninput="updateGauntlet()"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-tier1" class="tab-content">
+    <h2>Tier 1 Market-Making Controls</h2>
+    <p>Tier 1 is controlled through inventory, quoting, adverse-selection and liquidity-risk controls. Gross volume is not the objective; risk-adjusted net capture is.</p>
+    <div class="grid-2">
+      <div class="card" style="height:300px;position:relative;"><canvas id="markoutChart"></canvas></div>
+      <div class="card">
+        <h3>Adverse Flow & Inventory Simulator</h3>
+        <div class="slider-group"><div class="slider-header"><label>Post-fill toxicity index</label><span class="val-badge" id="tier1-tox-val">15 / 100</span></div><input type="range" id="tier1-tox-slider" min="0" max="100" value="15" oninput="updateTier1()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Inventory concentration</label><span class="val-badge" id="tier1-inv-val">25%</span></div><input type="range" id="tier1-inv-slider" min="0" max="100" value="25" oninput="updateTier1()"></div>
+        <div class="note"><span class="status-dot bg-success" id="tier1-dot"></span><span id="tier1-msg">Flow benign. Quotes remain active inside normal limits.</span></div>
+        <table style="margin-top:16px;">
+          <thead><tr><th>Condition</th><th>Automated action</th></tr></thead>
+          <tbody>
+            <tr><td>Negative markout</td><td>Widen spreads, reduce size, increase expected-edge requirement.</td></tr>
+            <tr><td>Inventory build-up</td><td>Skew quotes, hedge, stop adding exposure.</td></tr>
+            <tr><td>Liquidity deterioration</td><td>Pull quotes or move to one-sided / defensive quoting.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-tier2" class="tab-content">
+    <h2>Tier 2 Proprietary Alpha Controls</h2>
+    <p>Tier 2 strategies may involve model, event and directional risk. They require explicit hypothesis validation, liquidity checks, edge-decay monitoring and model retirement rules.</p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Tier 2 Strategy Risk Checklist</h3>
+        <table>
+          <thead><tr><th>Strategy</th><th>Primary Risk</th><th>Control</th></tr></thead>
+          <tbody>
+            <tr><td>Price-lag / sharp-book</td><td>Edge decay, crowding, latency, liquidity.</td><td>Live markouts, decay thresholds, small initial caps.</td></tr>
+            <tr><td>Sports / event alpha</td><td>Model error, injuries, weather, event concentration.</td><td>Calibration review, event caps, Kelly haircuts.</td></tr>
+            <tr><td>Computer vision</td><td>Data quality, spurious correlation, feature instability.</td><td>Human review, sample-size thresholds, feature tests.</td></tr>
+            <tr><td>Wallet / flow classification</td><td>Misclassification of sharp vs consumer flow.</td><td>Recalibration, cluster review, markout validation.</td></tr>
+            <tr><td>Tokenised RWA dislocations</td><td>Reference-price failure, basis and funding risk.</td><td>Multi-source reference validation and funding checks.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Model Decay / Event Risk Simulator</h3>
+        <div class="slider-group"><div class="slider-header"><label>Model confidence</label><span class="val-badge" id="t2-conf-val">82%</span></div><input type="range" id="t2-conf-slider" min="0" max="100" value="82" oninput="updateTier2()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Edge decay from launch</label><span class="val-badge" id="t2-decay-val">15%</span></div><input type="range" id="t2-decay-slider" min="0" max="100" value="15" oninput="updateTier2()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Event / settlement ambiguity</label><span class="val-badge" id="t2-event-val">10 / 100</span></div><input type="range" id="t2-event-slider" min="0" max="100" value="10" oninput="updateTier2()"></div>
+        <div class="note"><span class="status-dot bg-success" id="t2-dot"></span><span id="t2-msg">Tier 2 strategy valid. Capital permitted inside approved cap.</span></div>
+        <div style="height:180px;margin-top:18px;position:relative;"><canvas id="tier2Chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-master" class="tab-content active">
+    <p style="margin-top:0;">Real-time cross-tier control room monitoring capital allocations, risk state and strategy-level actions. Inject scenarios below to see how the risk engine responds.</p>
+    <div class="metric-row">
+      <div class="metric-box"><div class="metric-title">Portfolio State</div><div class="metric-val val-success" id="mc-sys-state">ACTIVE</div><div class="metric-sub" id="mc-state-sub">All tiers inside limits</div></div>
+      <div class="metric-box"><div class="metric-title">Active Trading Capital</div><div class="metric-val val-neutral" id="mc-active-cap">$250,000</div><div class="metric-sub">Initial trading envelope; $150k reserve protected</div></div>
+      <div class="metric-box"><div class="metric-title">Tier 1 Status</div><div class="metric-val val-tier1" id="mc-tier1">QUOTING</div><div class="metric-sub" id="mc-tier1-sub">Normal spread / inventory</div></div>
+      <div class="metric-box"><div class="metric-title">Tier 2 Status</div><div class="metric-val val-tier2" id="mc-tier2">VALID</div><div class="metric-sub" id="mc-tier2-sub">Signals inside confidence limits</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="border-bottom:1px solid var(--border-light);padding-bottom:14px;margin-bottom:22px;">Live Portfolio Risk Metrics</h3>
+        <div class="progress-row"><div class="progress-head"><span class="progress-label">Cross-tier event overlap</span><span class="progress-val" id="mc-overlap-val">Low</span></div><div class="track"><div class="fill" id="mc-overlap-bar" style="width:18%;background:var(--success);"></div></div></div>
+        <div class="progress-row"><div class="progress-head"><span class="progress-label">Tier 1 adverse selection</span><span class="progress-val" id="mc-tox-val">Benign</span></div><div class="track"><div class="fill" id="mc-tox-bar" style="width:15%;background:var(--success);"></div></div></div>
+        <div class="progress-row"><div class="progress-head"><span class="progress-label">Tier 2 model decay</span><span class="progress-val" id="mc-decay-val">Contained</span></div><div class="track"><div class="fill" id="mc-decay-bar" style="width:20%;background:var(--success);"></div></div></div>
+        <div class="progress-row"><div class="progress-head"><span class="progress-label">Venue/API latency</span><span class="progress-val" id="mc-lat-val">22 ms</span></div><div class="track"><div class="fill" id="mc-lat-bar" style="width:10%;background:var(--success);"></div></div></div>
+      </div>
+      <div class="card">
+        <h3 style="border-bottom:1px solid var(--border-light);padding-bottom:14px;margin-bottom:18px;">System Console Log Stream</h3>
+        <div class="log-container" id="mc-log"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:22px;">
+      <h3>Scenario Simulation Injector</h3>
+      <div class="pill-row">
+        <button class="scenario-btn active" id="btn-scen-normal" onclick="triggerScenario('normal')">Normal Cross-Tier Flow</button>
+        <button class="scenario-btn" id="btn-scen-toxic" onclick="triggerScenario('toxic')">Tier 1 Toxic Flow</button>
+        <button class="scenario-btn tier2" id="btn-scen-decay" onclick="triggerScenario('decay')">Tier 2 Edge Decay</button>
+        <button class="scenario-btn tier2" id="btn-scen-event" onclick="triggerScenario('event')">Event Settlement Shock</button>
+        <button class="scenario-btn" id="btn-scen-api" onclick="triggerScenario('api')">Venue/API Degradation</button>
+        <button class="scenario-btn danger" id="btn-scen-flash" onclick="triggerScenario('flash')">Portfolio Flash Crash</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let globalScore = 100;
+    let currentGateMode = 'tier1';
+    let logInterval;
+    let msStep = 1;
+    let timelockInterval;
+    let markoutChart;
+    let tier2Chart;
+
+    function formatCurrency(value) {
+      return '$' + Math.round(value).toLocaleString('en-US');
+    }
+
+    function setGlobalScore(score) {
+      globalScore = Math.max(0, Math.min(100, Math.round(score)));
+      const display = document.getElementById('global-score');
+      const mode = document.getElementById('mode-pill');
+      display.innerText = globalScore + '%';
+      if (globalScore > 80) {
+        display.style.color = 'var(--success)';
+        display.style.textShadow = '0 0 15px var(--success-glow)';
+        mode.innerText = 'Risk-Gated Deployment';
+        mode.style.color = 'var(--success)';
+        mode.style.borderColor = 'rgba(16,185,129,.35)';
+        mode.style.background = 'rgba(16,185,129,.12)';
+      } else if (globalScore > 50) {
+        display.style.color = 'var(--warning)';
+        display.style.textShadow = '0 0 15px var(--warning-glow)';
+        mode.innerText = 'Defensive Mode';
+        mode.style.color = 'var(--warning)';
+        mode.style.borderColor = 'rgba(245,158,11,.35)';
+        mode.style.background = 'rgba(245,158,11,.12)';
+      } else {
+        display.style.color = 'var(--danger)';
+        display.style.textShadow = '0 0 15px var(--danger-glow)';
+        mode.innerText = 'Trading Restricted';
+        mode.style.color = 'var(--danger)';
+        mode.style.borderColor = 'rgba(239,68,68,.35)';
+        mode.style.background = 'rgba(239,68,68,.12)';
+      }
+    }
+
+    function openTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      const btn = document.getElementById('btn-' + tabId);
+      if (btn) btn.classList.add('active');
+      if (tabId === 'tab-tier1' && !markoutChart) initMarkoutChart();
+      if (tabId === 'tab-tier2' && !tier2Chart) initTier2Chart();
+    }
+
+    function updateCapitalStack() {
+      const stress = parseFloat(document.getElementById('drawdown-slider').value);
+      const haircut = parseInt(document.getElementById('signal-haircut-slider').value);
+      document.getElementById('drawdown-val-badge').innerText = stress.toFixed(1) + '%';
+      document.getElementById('signal-haircut-badge').innerText = haircut + '%';
+
+      const totalEnvelope = 400000;
+      let active = 250000;
+      let reserve = 150000;
+      let msg = 'Normal conditions. $250k active trading capital available; $150k reserve protected.';
+      let dot = 'bg-success';
+      let score = 100;
+
+      if (stress >= 5 && stress < 15) {
+        active = 125000;
+        reserve = totalEnvelope - active;
+        msg = 'Elevated stress. Active trading capital reduced to $125k; remainder migrated to protected trading reserve.';
+        dot = 'bg-warning';
+        score = 68 - haircut * 0.15;
+      } else if (stress >= 15) {
+        active = 0;
+        reserve = totalEnvelope;
+        msg = 'Hard stress threshold breached. Automated trading halted and full $400k trading envelope held in reserve.';
+        dot = 'bg-danger';
+        score = 20;
+      } else if (haircut >= 60) {
+        msg = 'Tier 2 signal confidence materially reduced. Tier 2 deployment blocked; $250k active capital remains available for Tier 1 market making only.';
+        dot = 'bg-warning';
+        score = 78 - haircut * 0.2;
+      } else if (haircut > 0) {
+        msg = 'Tier 2 confidence haircut applied inside the $250k active trading envelope. No automatic scale-up permitted.';
+        dot = 'bg-success';
+        score = 100 - haircut * 0.15;
+      }
+
+      document.getElementById('bar-active').style.width = (active / totalEnvelope * 100) + '%';
+      document.getElementById('bar-reserve').style.width = (reserve / totalEnvelope * 100) + '%';
+      document.getElementById('amt-active').innerText = formatCurrency(active);
+      document.getElementById('amt-reserve').innerText = formatCurrency(reserve);
+      document.getElementById('drawdown-dot').className = 'status-dot ' + dot;
+      document.getElementById('drawdown-msg').innerText = msg;
+      setGlobalScore(score);
+    }
+
+    function updateKillSwitches() {
+      const dd = parseFloat(document.getElementById('ks-dd-slider').value);
+      const api = parseInt(document.getElementById('api-slider').value);
+      const tox = parseInt(document.getElementById('tox-ks-slider').value);
+      const edgeGap = parseInt(document.getElementById('edge-gap-slider').value);
+      document.getElementById('ks-dd-val').innerText = dd.toFixed(1) + '%';
+      document.getElementById('api-val').innerText = api + ' ms';
+      document.getElementById('tox-ks-val').innerText = tox + ' / 100';
+      document.getElementById('edge-gap-val').innerText = edgeGap + ' bps';
+
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById('ks-' + i).className = 'status-dot bg-success';
+        document.getElementById('card-ks-' + i).style.borderColor = 'var(--border-light)';
+      }
+
+      let msg = 'System risk gates normal. Strategy activity permitted inside approved caps.';
+      let color = 'var(--success)';
+      let score = 100;
+      let hard = false;
+
+      if (dd >= 8) { document.getElementById('ks-1').className = 'status-dot bg-danger'; document.getElementById('card-ks-1').style.borderColor = 'var(--danger)'; hard = true; }
+      else if (dd >= 4) { document.getElementById('ks-1').className = 'status-dot bg-warning'; score = Math.min(score, 70); }
+
+      if (api > 500) { document.getElementById('ks-2').className = 'status-dot bg-danger'; document.getElementById('card-ks-2').style.borderColor = 'var(--danger)'; hard = true; }
+      else if (api > 200) { document.getElementById('ks-2').className = 'status-dot bg-warning'; score = Math.min(score, 70); }
+
+      if (tox > 75) { document.getElementById('ks-3').className = 'status-dot bg-danger'; document.getElementById('card-ks-3').style.borderColor = 'var(--danger)'; score = Math.min(score, 35); }
+      else if (tox > 45) { document.getElementById('ks-3').className = 'status-dot bg-warning'; score = Math.min(score, 72); }
+
+      if (edgeGap > 25) { document.getElementById('ks-4').className = 'status-dot bg-danger'; document.getElementById('card-ks-4').style.borderColor = 'var(--danger)'; score = Math.min(score, 38); }
+      else if (edgeGap > 10) { document.getElementById('ks-4').className = 'status-dot bg-warning'; score = Math.min(score, 74); }
+
+      if (hard) { msg = 'CRITICAL BOUNDARY BREACHED. Portfolio kill-switch engaged. Halt trading and require manual review.'; color = 'var(--danger)'; score = 15; }
+      else if (score < 80) { msg = 'Defensive mode. Reduce size, widen quotes, pause affected Tier 2 signals and monitor exposure aggregation.'; color = 'var(--warning)'; }
+
+      const el = document.getElementById('ks-msg');
+      el.innerText = msg;
+      el.style.color = color;
+      setGlobalScore(score);
+    }
+
+    function advanceMultiSig() {
+      const btn = document.getElementById('ms-btn');
+      const msg = document.getElementById('ms-msg');
+      const ratio = document.getElementById('quorum-ratio');
+      if (msStep === 1) {
+        document.getElementById('ms-1').classList.replace('active', 'completed');
+        document.getElementById('ms-2').classList.add('active');
+        btn.innerText = 'Verify Strategy/Tier Capital Cap';
+        msg.innerHTML = '<span style="color:var(--accent-blue-light)">Whitelist verified.</span> Checking approved tier and strategy cap.';
+        msStep++;
+      } else if (msStep === 2) {
+        document.getElementById('ms-2').classList.replace('active', 'completed');
+        document.getElementById('ms-3').classList.add('active');
+        btn.innerText = 'Process Signer 1 Hardware Key';
+        msg.innerText = 'Capital cap verified. Awaiting hardware signer quorum.';
+        msStep++;
+      } else if (msStep === 3) {
+        ratio.innerText = '1/2'; ratio.style.color = 'var(--warning)';
+        document.getElementById('key-1').style.borderColor = 'var(--success)';
+        btn.innerText = 'Process Signer 2 Hardware Key';
+        msg.innerHTML = 'Signer 1 validated. Awaiting second signature.';
+        msStep++;
+      } else if (msStep === 4) {
+        ratio.innerText = '2/2'; ratio.style.color = 'var(--success)';
+        document.getElementById('key-2').style.borderColor = 'var(--success)';
+        document.getElementById('ms-3').classList.replace('active', 'completed');
+        document.getElementById('ms-4').classList.add('active');
+        btn.innerText = 'Start Time-Lock / Veto Window';
+        msg.innerHTML = 'Quorum secured. Time-lock required before transfer finalisation.';
+        msStep++;
+      } else if (msStep === 5) {
+        document.getElementById('timelock-display').style.display = 'inline-block';
+        btn.innerText = 'Time-Lock Active'; btn.disabled = true;
+        msg.innerHTML = '<span style="color:var(--warning)">Time-lock active.</span> Transfer can still be vetoed.';
+        let hrs = 23, mins = 59, secs = 59;
+        timelockInterval = setInterval(() => {
+          secs--; if (secs < 0) { secs = 59; mins--; }
+          document.getElementById('timelock-display').innerText = `${hrs}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+        }, 50);
+        setTimeout(() => {
+          clearInterval(timelockInterval);
+          document.getElementById('timelock-display').innerText = '00:00:00';
+          document.getElementById('timelock-display').style.color = 'var(--success)';
+          btn.disabled = false; btn.innerText = 'Finalize Segregated Transfer';
+          msg.innerHTML = 'Time-lock cleared. Ready to fund segregated trade-only account.';
+          msStep++;
+        }, 2000);
+      } else if (msStep === 6) {
+        document.getElementById('ms-4').classList.replace('active', 'completed');
+        document.getElementById('ms-5').classList.add('completed');
+        btn.innerText = 'Transfer Settled'; btn.disabled = true;
+        msg.innerHTML = '<strong style="color:var(--success)">Complete:</strong> Funds sent to restricted trade-only account.';
+      }
+    }
+
+    function setPipeline(stage, el) {
+      document.querySelectorAll('#tab-pipeline .step').forEach(node => node.classList.remove('active'));
+      el.classList.add('active');
+      const allocations = [
+        {h:'0%', val:0, text:'Research only. No trading capital permitted.'},
+        {h:'0%', val:0, text:'Live observation only. No order placement.'},
+        {h:'3%', val:1000, text:'Micro-live only. Tests execution path and reconciliation.'},
+        {h:'18%', val:25000, text:'Limited deployment inside strict strategy and drawdown caps.'},
+        {h:'100%', val:250000, text:'Scaled initial deployment only after validated performance and risk controls. Further scale-up to $500k / $750k requires cashflow and formal approval.'}
+      ];
+      document.getElementById('alloc-fill').style.height = allocations[stage].h;
+      document.getElementById('alloc-text').innerText = allocations[stage].val === 0 ? '$0' : formatCurrency(allocations[stage].val);
+      document.getElementById('alloc-caption').innerText = allocations[stage].text;
+    }
+
+    function setGateMode(mode) {
+      currentGateMode = mode;
+      document.getElementById('gate-mode-tier1').classList.toggle('active', mode === 'tier1');
+      document.getElementById('gate-mode-tier2').classList.toggle('active', mode === 'tier2');
+      const label = document.getElementById('g-special-label');
+      const val = document.getElementById('g-special-val');
+      if (mode === 'tier1') {
+        label.innerText = 'Inventory concentration';
+      } else {
+        label.innerText = 'Model / event risk score';
+      }
+      updateGauntlet();
+    }
+
+    function updateGauntlet() {
+      const lat = parseInt(document.getElementById('g-lat').value);
+      const edge = parseInt(document.getElementById('g-edge').value);
+      const tox = parseInt(document.getElementById('g-tox').value);
+      const special = parseInt(document.getElementById('g-special').value);
+      document.getElementById('g-lat-val').innerText = lat + ' ms';
+      document.getElementById('g-edge-val').innerText = edge + ' bps';
+      document.getElementById('g-tox-val').innerText = tox + ' / 100';
+      document.getElementById('g-special-val').innerText = currentGateMode === 'tier1' ? special + '%' : special + ' / 100';
+      const layers = ['g-0','g-1','g-2','g-3'].map(id => document.getElementById(id));
+      layers.forEach(el => el.style.background = 'var(--success)');
+      let failed = false;
+      let reason = 'RISK GATE PASSED';
+      if (lat > 100) { layers[0].style.background = 'var(--danger)'; failed = true; reason = 'TRADE BLOCKED · STALE / SLOW DATA'; }
+      if (edge <= 0) { layers[1].style.background = 'var(--danger)'; failed = true; reason = 'TRADE BLOCKED · EDGE AFTER COSTS <= 0'; }
+      if (tox > 70) { layers[2].style.background = 'var(--danger)'; failed = true; reason = 'TRADE BLOCKED · ADVERSE SELECTION / LIQUIDITY RISK'; }
+      if (special > (currentGateMode === 'tier1' ? 75 : 65)) { layers[3].style.background = 'var(--danger)'; failed = true; reason = currentGateMode === 'tier1' ? 'TRADE BLOCKED · INVENTORY LIMIT' : 'TRADE BLOCKED · MODEL / EVENT RISK'; }
+      const res = document.getElementById('g-result');
+      res.innerText = reason;
+      res.style.color = failed ? 'var(--danger)' : 'var(--success)';
+      setGlobalScore(failed ? 42 : 100);
+    }
+
+    function initMarkoutChart() {
+      const ctx = document.getElementById('markoutChart').getContext('2d');
+      Chart.defaults.color = '#717A86';
+      Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+      markoutChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: ['0ms','100ms','1s','5s','60s'], datasets: [{ label: 'Post-fill markout (bps)', data: [0,1,1.5,2,2], borderColor:'#3F8765', borderWidth:3, tension:.3, fill:true, backgroundColor:'rgba(16,185,129,.1)' }] },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{min:-18,max:6,grid:{color:'rgba(22,32,46,0.14)'}}, x:{grid:{color:'rgba(22,32,46,0.14)'}} } }
+      });
+    }
+
+    function updateTier1() {
+      if (!markoutChart) initMarkoutChart();
+      const tox = parseInt(document.getElementById('tier1-tox-slider').value);
+      const inv = parseInt(document.getElementById('tier1-inv-slider').value);
+      document.getElementById('tier1-tox-val').innerText = tox + ' / 100';
+      document.getElementById('tier1-inv-val').innerText = inv + '%';
+      let data, color, bg, msg, dot, score;
+      if (tox < 40 && inv < 60) {
+        data = [0,1,1.5,2,2]; color='#3F8765'; bg='rgba(16,185,129,.1)'; msg='Flow benign. Quotes remain active inside normal limits.'; dot='bg-success'; score=100;
+      } else if (tox < 75 && inv < 85) {
+        data = [0,-2,-4,-1,1]; color='#B5893D'; bg='rgba(245,158,11,.1)'; msg='Defensive mode. Widen quotes, reduce size and skew away from inventory.'; dot='bg-warning'; score=70;
+      } else {
+        data = [0,-6,-10,-12,-15]; color='#B14B3A'; bg='rgba(239,68,68,.1)'; msg='Tier 1 risk breach. Pause quoting and prioritise exposure reduction.'; dot='bg-danger'; score=32;
+      }
+      markoutChart.data.datasets[0].data = data;
+      markoutChart.data.datasets[0].borderColor = color;
+      markoutChart.data.datasets[0].backgroundColor = bg;
+      markoutChart.update();
+      document.getElementById('tier1-dot').className = 'status-dot ' + dot;
+      document.getElementById('tier1-msg').innerText = msg;
+      setGlobalScore(score);
+    }
+
+    function initTier2Chart() {
+      const ctx = document.getElementById('tier2Chart').getContext('2d');
+      tier2Chart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels:['Expected','Realised','Liquidity','Confidence'], datasets:[{ data:[10,8,7,8.2], backgroundColor:['#2E5AAC','#B5893D','#AFB6BF','#3F8765'], borderRadius:4 }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{min:0,max:12,grid:{color:'rgba(22,32,46,0.14)'}, ticks:{callback:v => v + ' bps'}}, x:{grid:{display:false}} } }
+      });
+    }
+
+    function updateTier2() {
+      if (!tier2Chart) initTier2Chart();
+      const conf = parseInt(document.getElementById('t2-conf-slider').value);
+      const decay = parseInt(document.getElementById('t2-decay-slider').value);
+      const event = parseInt(document.getElementById('t2-event-slider').value);
+      document.getElementById('t2-conf-val').innerText = conf + '%';
+      document.getElementById('t2-decay-val').innerText = decay + '%';
+      document.getElementById('t2-event-val').innerText = event + ' / 100';
+      const realised = Math.max(0, 10 * (conf / 100) * (1 - decay / 100) - event / 20);
+      const liquidity = Math.max(0, 9 - event / 18);
+      tier2Chart.data.datasets[0].data = [10, realised, liquidity, conf / 10];
+      tier2Chart.update();
+      let msg = 'Tier 2 strategy valid. Capital permitted inside approved cap.';
+      let dot = 'bg-success';
+      let score = 100;
+      if (conf < 55 || decay > 55 || event > 60) {
+        msg = 'Tier 2 risk breach. Pause or reduce strategy; require model review before scaling.';
+        dot = 'bg-danger';
+        score = 38;
+      } else if (conf < 70 || decay > 35 || event > 35) {
+        msg = 'Tier 2 caution. Reduce capital cap, demand higher expected edge and monitor markouts.';
+        dot = 'bg-warning';
+        score = 72;
+      }
+      document.getElementById('t2-dot').className = 'status-dot ' + dot;
+      document.getElementById('t2-msg').innerText = msg;
+      setGlobalScore(score);
+    }
+
+    function addLog(msg, type='info') {
+      const box = document.getElementById('mc-log');
+      if (!box) return;
+      const now = new Date();
+      const time = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}.${String(now.getMilliseconds()).padStart(3,'0')}]`;
+      let color = 'var(--text-primary)';
+      if (type === 'warn') color = 'var(--warning)';
+      if (type === 'danger') color = 'var(--danger)';
+      if (type === 'tier2') color = 'var(--tier2)';
+      if (type === 'tier1') color = 'var(--tier1)';
+      const div = document.createElement('div');
+      div.style.marginBottom = '2px';
+      div.innerHTML = `<span class="log-time">${time}</span><span style="color:${color};">${msg}</span>`;
+      box.appendChild(div);
+      if (box.children.length > 90) box.removeChild(box.firstChild);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function setMeter(id, pct, color, textId, text) {
+      document.getElementById(id).style.width = pct + '%';
+      document.getElementById(id).style.background = color;
+      document.getElementById(textId).innerText = text;
+    }
+
+    function triggerScenario(type) {
+      clearInterval(logInterval);
+      document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-scen-' + type).classList.add('active');
+      const state = document.getElementById('mc-sys-state');
+      const stateSub = document.getElementById('mc-state-sub');
+      const cap = document.getElementById('mc-active-cap');
+      const t1 = document.getElementById('mc-tier1');
+      const t1Sub = document.getElementById('mc-tier1-sub');
+      const t2 = document.getElementById('mc-tier2');
+      const t2Sub = document.getElementById('mc-tier2-sub');
+
+      if (type === 'normal') {
+        state.innerText = 'ACTIVE'; state.className = 'metric-val val-success'; stateSub.innerText = 'All tiers inside limits';
+        cap.innerText = '$250,000'; cap.className = 'metric-val val-neutral';
+        t1.innerText = 'QUOTING'; t1.className = 'metric-val val-tier1'; t1Sub.innerText = 'Normal spread / inventory';
+        t2.innerText = 'VALID'; t2.className = 'metric-val val-tier2'; t2Sub.innerText = 'Signals inside confidence limits';
+        setMeter('mc-overlap-bar',18,'var(--success)','mc-overlap-val','Low');
+        setMeter('mc-tox-bar',15,'var(--success)','mc-tox-val','Benign');
+        setMeter('mc-decay-bar',20,'var(--success)','mc-decay-val','Contained');
+        setMeter('mc-lat-bar',10,'var(--success)','mc-lat-val','22 ms');
+        setGlobalScore(100);
+        logInterval = setInterval(() => {
+          const samples = [
+            ['TIER1_MM: fill received; post-fill markout positive at 1000ms', 'tier1'],
+            ['TIER2_ALPHA: price-lag candidate passed liquidity and edge gates', 'tier2'],
+            ['RISK_ENGINE: cross-tier exposure inside event and venue limits', 'info'],
+            ['RECON: venue fills matched internal ledger state', 'info']
+          ];
+          const s = samples[Math.floor(Math.random()*samples.length)]; addLog(s[0], s[1]);
+        }, 1450);
+      }
+      else if (type === 'toxic') {
+        state.innerText = 'DEFENSIVE'; state.className = 'metric-val val-warning'; stateSub.innerText = 'Tier 1 liquidity reduced';
+        cap.innerText = '$185,000'; cap.className = 'metric-val val-neutral';
+        t1.innerText = 'WIDENING'; t1.className = 'metric-val val-warning'; t1Sub.innerText = 'Toxic flow detected';
+        t2.innerText = 'VALID'; t2.className = 'metric-val val-tier2'; t2Sub.innerText = 'No shared exposure breach';
+        setMeter('mc-overlap-bar',28,'var(--success)','mc-overlap-val','Low / medium');
+        setMeter('mc-tox-bar',88,'var(--warning)','mc-tox-val','Adverse selection');
+        setMeter('mc-decay-bar',20,'var(--success)','mc-decay-val','Contained');
+        setMeter('mc-lat-bar',12,'var(--success)','mc-lat-val','26 ms');
+        setGlobalScore(72);
+        addLog('TIER1_MM: negative markout cluster detected after taker fills', 'warn');
+        addLog('ACTION: widen quotes, reduce order size, raise expected-edge threshold', 'info');
+        logInterval = setInterval(() => addLog('TIER1_MM: hostile flow blocked by defensive quoting barrier', 'tier1'), 1800);
+      }
+      else if (type === 'decay') {
+        state.innerText = 'DEFENSIVE'; state.className = 'metric-val val-warning'; stateSub.innerText = 'Tier 2 capital capped';
+        cap.innerText = '$250,000'; cap.className = 'metric-val val-neutral';
+        t1.innerText = 'QUOTING'; t1.className = 'metric-val val-tier1'; t1Sub.innerText = 'Normal spread / inventory';
+        t2.innerText = 'PAUSED'; t2.className = 'metric-val val-warning'; t2Sub.innerText = 'Edge decay threshold crossed';
+        setMeter('mc-overlap-bar',35,'var(--warning)','mc-overlap-val','Medium');
+        setMeter('mc-tox-bar',20,'var(--success)','mc-tox-val','Benign');
+        setMeter('mc-decay-bar',92,'var(--warning)','mc-decay-val','Edge decay');
+        setMeter('mc-lat-bar',10,'var(--success)','mc-lat-val','20 ms');
+        setGlobalScore(68);
+        addLog('TIER2_ALPHA: realised markouts below expected after fees and slippage', 'tier2');
+        addLog('ACTION: pause affected alpha model; require research review before scaling', 'warn');
+        logInterval = setInterval(() => addLog('MODEL_RISK: monitoring live-vs-expected markout divergence', 'tier2'), 2000);
+      }
+      else if (type === 'event') {
+        state.innerText = 'REVIEW'; state.className = 'metric-val val-warning'; stateSub.innerText = 'Event ambiguity override';
+        cap.innerText = '$160,000'; cap.className = 'metric-val val-neutral';
+        t1.innerText = 'LIMITED'; t1.className = 'metric-val val-warning'; t1Sub.innerText = 'Event venue reduced';
+        t2.innerText = 'HALTED'; t2.className = 'metric-val val-danger'; t2Sub.innerText = 'Settlement ambiguity';
+        setMeter('mc-overlap-bar',78,'var(--warning)','mc-overlap-val','High event overlap');
+        setMeter('mc-tox-bar',40,'var(--warning)','mc-tox-val','Elevated');
+        setMeter('mc-decay-bar',60,'var(--warning)','mc-decay-val','Event-risk spike');
+        setMeter('mc-lat-bar',15,'var(--success)','mc-lat-val','32 ms');
+        setGlobalScore(55);
+        addLog('EVENT_RISK: settlement rule ambiguity detected for active market', 'warn');
+        addLog('ACTION: halt new Tier 2 positions; aggregate same-event exposure', 'danger');
+        logInterval = setInterval(() => addLog('GOVERNANCE: awaiting manual review for ambiguous event resolution', 'warn'), 2100);
+      }
+      else if (type === 'api') {
+        state.innerText = 'DEFENSIVE'; state.className = 'metric-val val-warning'; stateSub.innerText = 'Venue/API degraded';
+        cap.innerText = '$100,000'; cap.className = 'metric-val val-neutral';
+        t1.innerText = 'CANCEL'; t1.className = 'metric-val val-warning'; t1Sub.innerText = 'Cancel/replace only';
+        t2.innerText = 'BLOCKED'; t2.className = 'metric-val val-warning'; t2Sub.innerText = 'Freshness gate failed';
+        setMeter('mc-overlap-bar',20,'var(--success)','mc-overlap-val','Low');
+        setMeter('mc-tox-bar',20,'var(--success)','mc-tox-val','Benign');
+        setMeter('mc-decay-bar',25,'var(--success)','mc-decay-val','Contained');
+        setMeter('mc-lat-bar',96,'var(--danger)','mc-lat-val','620 ms');
+        setGlobalScore(58);
+        addLog('API_GATEWAY: latency jitter > 500ms; freshness gate failed', 'warn');
+        addLog('ACTION: cancel resting orders; block new orders on degraded venue', 'danger');
+        logInterval = setInterval(() => addLog('DATA_GATE: stale market frame dropped before strategy evaluation', 'warn'), 1700);
+      }
+      else if (type === 'flash') {
+        state.innerText = 'HALTED'; state.className = 'metric-val val-danger'; stateSub.innerText = 'Portfolio kill-switch active';
+        cap.innerText = '$0'; cap.className = 'metric-val val-danger';
+        t1.innerText = 'OFF'; t1.className = 'metric-val val-danger'; t1Sub.innerText = 'All quotes cancelled';
+        t2.innerText = 'OFF'; t2.className = 'metric-val val-danger'; t2Sub.innerText = 'All signals blocked';
+        setMeter('mc-overlap-bar',100,'var(--danger)','mc-overlap-val','Critical');
+        setMeter('mc-tox-bar',100,'var(--danger)','mc-tox-val','Extreme');
+        setMeter('mc-decay-bar',100,'var(--danger)','mc-decay-val','Invalid');
+        setMeter('mc-lat-bar',100,'var(--danger)','mc-lat-val','Gateway timeout');
+        setGlobalScore(12);
+        addLog('CRITICAL: portfolio volatility / drawdown boundary breached', 'danger');
+        addLog('ACTION: mass-cancel resting orders and block new strategy candidates', 'danger');
+        addLog('ACTION: migrate automated trading capital back to reserve tier', 'danger');
+        addLog('SYSTEM: manual founder / board review required before restart', 'danger');
+      }
+    }
+
+    function boot() {
+      setGlobalScore(100);
+      setPipeline(0, document.querySelector('#tab-pipeline .step'));
+      setGateMode('tier1');
+      initMarkoutChart();
+      initTier2Chart();
+      setTimeout(() => triggerScenario('normal'), 350);
+    }
+    boot();
+  </script>
+</body>
+</html>
