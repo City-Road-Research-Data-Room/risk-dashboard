@@ -614,14 +614,14 @@
     <button class="tab-btn" id="btn-tab-multisig" onclick="openTab('tab-multisig')">4. Treasury Multi-Sig</button>
     <button class="tab-btn" id="btn-tab-pipeline" onclick="openTab('tab-pipeline')">5. Deployment Pipeline</button>
     <button class="tab-btn" id="btn-tab-gauntlet" onclick="openTab('tab-gauntlet')">6. Pre-Trade Gate</button>
-    <button class="tab-btn" id="btn-tab-tier1" onclick="openTab('tab-tier1')">7. Tier 1 Controls</button>
-    <button class="tab-btn" id="btn-tab-tier2" onclick="openTab('tab-tier2')">8. Tier 2 Controls</button>
+    <button class="tab-btn" id="btn-tab-tier1" onclick="openTab('tab-tier1')">7. Spread / MM Controls</button>
+    <button class="tab-btn" id="btn-tab-tier2" onclick="openTab('tab-tier2')">8. EV Model Controls</button>
     <button class="tab-btn active" id="btn-tab-master" onclick="openTab('tab-master')">9. Live Control Room</button>
   </div>
 
   <div id="tab-capital" class="tab-content">
     <h2>Portfolio Capital Stack</h2>
-    <p>Initial trading programme structure from the latest model: <strong>$250,000 active trading capital</strong> with a separate <strong>$150,000 trading reserve</strong>. Operating runway and team / infrastructure spend sit outside the automated trading envelope.</p>
+    <p>Initial trading programme structure from the current model: <strong>$250,000 active trading capital</strong> with a separate <strong>$150,000 trading reserve</strong> — a $400k trading envelope. Operating runway and team / infrastructure spend sit outside the automated trading envelope and are funded from the $1.0M raise.</p>
     <div class="stack-bar">
       <div id="bar-active" class="stack-segment" style="width: 62.5%; background:var(--accent-blue);"><small>Active trading capital</small><span id="amt-active">$250,000</span></div>
       <div id="bar-reserve" class="stack-segment" style="width: 37.5%; background:var(--ink);"><small>Trading reserve</small><span id="amt-reserve">$150,000</span></div>
@@ -633,10 +633,10 @@
         <table>
           <thead><tr><th>Bucket</th><th>Purpose</th><th>Initial state</th></tr></thead>
           <tbody>
-            <tr><td><span class="status-dot bg-tier1"></span>Active trading capital</td><td>Capital available for approved Tier 1 market-making first, with Tier 2 only inside validated strategy caps.</td><td>$250k</td></tr>
+            <tr><td><span class="status-dot bg-tier1"></span>Active trading capital</td><td>Capital available for approved spread trading and market making first, with EV-model strategies only inside validated strategy caps.</td><td>$250k</td></tr>
             <tr><td><span class="status-dot bg-success"></span>Trading reserve</td><td>Protected liquidity buffer used for drawdown defence, settlement needs and staged top-ups.</td><td>$150k</td></tr>
-            <tr><td><span class="status-dot bg-warning"></span>Tier 2 sub-caps</td><td>Not a separate funded pot. Tier 2 uses the active trading envelope only after validation and confidence gates.</td><td>Gated / capped</td></tr>
-            <tr><td><span class="status-dot bg-success"></span>Operating runway</td><td>Payroll, admin, legal and infrastructure are funded separately and should not be confused with trading capital.</td><td>Outside trading stack</td></tr>
+            <tr><td><span class="status-dot bg-warning"></span>EV-model sub-caps</td><td>Not a separate funded pot. EV-model strategies draw on the active trading envelope only after validation and confidence gates.</td><td>Gated / capped</td></tr>
+            <tr><td><span class="status-dot bg-success"></span>Operating runway</td><td>Payroll, admin, legal and infrastructure are funded separately from the raise and should not be confused with trading capital.</td><td>Outside trading stack</td></tr>
           </tbody>
         </table>
       </div>
@@ -647,7 +647,7 @@
           <tbody>
             <tr><td>Initial launch</td><td>$250k</td><td>Modelled starting active trading capital.</td></tr>
             <tr><td>Validated scale-up</td><td>$500k</td><td>Only after live evidence, controlled drawdown and cashflow support.</td></tr>
-            <tr><td>Mature capacity</td><td>$750k</td><td>Recycled cashflow / validated performance expands the trading envelope.</td></tr>
+            <tr><td>Mature capacity</td><td>$750k</td><td>Recycled cashflow / validated performance expands the active trading envelope — not a separately funded reserve.</td></tr>
           </tbody>
         </table>
         <div class="slider-group" style="margin-top:22px;">
@@ -655,7 +655,7 @@
           <input type="range" id="drawdown-slider" min="0" max="25" step="0.5" value="0" oninput="updateCapitalStack()" />
         </div>
         <div class="slider-group">
-          <div class="slider-header"><label>Tier 2 signal confidence haircut</label><span class="val-badge" id="signal-haircut-badge">0%</span></div>
+          <div class="slider-header"><label>EV-model signal confidence haircut</label><span class="val-badge" id="signal-haircut-badge">0%</span></div>
           <input type="range" id="signal-haircut-slider" min="0" max="100" step="5" value="0" oninput="updateCapitalStack()" />
         </div>
         <div class="note"><span class="status-dot bg-success" id="drawdown-dot"></span><span id="drawdown-msg">Normal conditions. $250k active trading capital available; $150k reserve protected.</span></div>
@@ -665,11 +665,11 @@
 
   <div id="tab-tiers" class="tab-content">
     <h2>Two-Tier Risk Architecture</h2>
-    <p>City Road does not treat market making and alpha strategies as separate businesses. They share the same data spine, execution gateways, risk engine, capital allocation process, kill-switches, custody controls and governance framework.</p>
+    <p>City Road does not treat market making and EV-model strategies as separate businesses. They share the same data spine, execution gateways, risk engine, capital allocation process, kill-switches, custody controls and governance framework.</p>
     <div class="grid-2">
       <div class="card tier1">
-        <h3><span class="status-dot bg-tier1"></span>Tier 1 · Market Making & Liquidity Provision</h3>
-        <p>Strategies that seek to earn net spread, rebates, funding or liquidity incentives by quoting selected markets where risk-adjusted economics are attractive.</p>
+        <h3><span class="status-dot bg-tier1"></span>Tier 1 · Spread Trading &amp; Market Making</h3>
+        <p>Maker-led strategies that seek to earn net spread, rebates, funding or liquidity incentives by quoting selected sports markets where risk-adjusted economics are attractive.</p>
         <table>
           <tbody>
             <tr><td>Primary risks</td><td>Inventory build-up, adverse selection, stale data, execution failure, latency, volatility shocks.</td></tr>
@@ -679,8 +679,8 @@
         </table>
       </div>
       <div class="card tier2">
-        <h3><span class="status-dot bg-tier2"></span>Tier 2 · Proprietary Alpha Strategies</h3>
-        <p>Strategies that seek to capture mispricings from cross-venue price discovery, sports/event modelling, RWA dislocations, flow classification and research signals.</p>
+        <h3><span class="status-dot bg-tier2"></span>Tier 2 · Proprietary EV Models</h3>
+        <p>Expected-value strategies that seek to capture mispricings from cross-venue price discovery, sports / event modelling, flow classification and research signals combining symmetric and asymmetric data.</p>
         <table>
           <tbody>
             <tr><td>Primary risks</td><td>Model error, overfitting, stale edge, directional exposure, event risk, signal decay, correlation.</td></tr>
@@ -695,9 +695,9 @@
       <table>
         <thead><tr><th>Shared Risk</th><th>Example</th><th>Portfolio Response</th></tr></thead>
         <tbody>
-          <tr><td>Same event</td><td>Tier 1 quoting an NFL market while Tier 2 carries a sports-model position on the same game.</td><td>Aggregate exposure; reduce new size or require manual approval.</td></tr>
-          <tr><td>Same venue</td><td>Market making and alpha both active on the same prediction-market venue.</td><td>Apply combined venue cap and settlement-window cap.</td></tr>
-          <tr><td>Same reference price</td><td>RWA dislocation strategy and MM both depend on the same oil/gold reference feed.</td><td>Require multi-source reference validation or defensive mode.</td></tr>
+          <tr><td>Same event</td><td>Spread / MM quoting an NFL market while an EV model carries a sports-model position on the same game.</td><td>Aggregate exposure; reduce new size or require manual approval.</td></tr>
+          <tr><td>Same venue</td><td>Market making and EV models both active on the same prediction-market venue.</td><td>Apply combined venue cap and settlement-window cap.</td></tr>
+          <tr><td>Same reference price</td><td>Two EV models depending on the same odds / stats reference feed for the same league.</td><td>Require multi-source reference validation or defensive mode.</td></tr>
           <tr><td>Correlated signals</td><td>Price-lag, wallet-flow and sports-model signals point to the same exposure.</td><td>Apply correlation haircut and consolidated drawdown limit.</td></tr>
         </tbody>
       </table>
@@ -706,20 +706,20 @@
 
   <div id="tab-killswitch" class="tab-content">
     <h2>Portfolio, Tier and Venue Kill-Switches</h2>
-    <p>Execution limits freeze or reduce activity without waiting for human reaction. The same kill-switch layer can stop a venue, strategy, tier or the whole portfolio.</p>
+    <p>Execution limits freeze or reduce activity without waiting for human reaction. The same kill-switch layer can stop a venue, strategy, tier or the whole portfolio. Hard thresholds below are set to the model's risk parameters: <strong>&minus;$10,000 daily loss</strong>, <strong>200ms / 2% oracle divergence</strong>, <strong>80% max inventory</strong>, and a realised-vs-expected edge gap measured against the modelled <strong>11 bps net</strong> capture.</p>
     <div class="grid-2">
       <div class="card tight">
-        <div class="risk-item" id="card-ks-1"><div><strong>Portfolio drawdown limit</strong><span>Hard stop when daily / weekly loss thresholds are breached.</span></div><span class="status-dot bg-success" id="ks-1"></span></div>
-        <div class="risk-item" id="card-ks-2"><div><strong>Venue/API instability</strong><span>Cancel resting orders and halt venue on degraded acknowledgements or stale state.</span></div><span class="status-dot bg-success" id="ks-2"></span></div>
-        <div class="risk-item" id="card-ks-3"><div><strong>Tier 1 adverse selection</strong><span>Widen, reduce size or stop quoting if post-fill markouts turn negative.</span></div><span class="status-dot bg-success" id="ks-3"></span></div>
-        <div class="risk-item" id="card-ks-4"><div><strong>Tier 2 model decay</strong><span>Disable alpha strategy if live markouts diverge from expected edge.</span></div><span class="status-dot bg-success" id="ks-4"></span></div>
+        <div class="risk-item" id="card-ks-1"><div><strong>Portfolio drawdown limit</strong><span>Hard stop at the &minus;$10,000 daily-loss threshold; cumulative limit escalates to founder review.</span></div><span class="status-dot bg-success" id="ks-1"></span></div>
+        <div class="risk-item" id="card-ks-2"><div><strong>Venue / oracle instability</strong><span>Cancel resting orders and halt venue on &gt;200ms latency or &gt;2% oracle / reference divergence.</span></div><span class="status-dot bg-success" id="ks-2"></span></div>
+        <div class="risk-item" id="card-ks-3"><div><strong>Spread / MM adverse selection</strong><span>Widen, reduce size or stop quoting if post-fill markouts turn negative or inventory exceeds 80%.</span></div><span class="status-dot bg-success" id="ks-3"></span></div>
+        <div class="risk-item" id="card-ks-4"><div><strong>EV-model edge decay</strong><span>Disable EV strategy if realised markouts diverge materially from the modelled 11 bps net edge.</span></div><span class="status-dot bg-success" id="ks-4"></span></div>
       </div>
       <div class="card">
         <h3>Live Trigger Controls</h3>
-        <div class="slider-group"><div class="slider-header"><label>Portfolio drawdown</label><span class="val-badge" id="ks-dd-val">1.0%</span></div><input type="range" id="ks-dd-slider" min="0" max="15" step="0.5" value="1" oninput="updateKillSwitches()"></div>
-        <div class="slider-group"><div class="slider-header"><label>API roundtrip latency</label><span class="val-badge" id="api-val">80 ms</span></div><input type="range" id="api-slider" min="10" max="1500" value="80" step="10" oninput="updateKillSwitches()"></div>
-        <div class="slider-group"><div class="slider-header"><label>Tier 1 toxicity score</label><span class="val-badge" id="tox-ks-val">15 / 100</span></div><input type="range" id="tox-ks-slider" min="0" max="100" value="15" oninput="updateKillSwitches()"></div>
-        <div class="slider-group"><div class="slider-header"><label>Tier 2 realised / expected edge gap</label><span class="val-badge" id="edge-gap-val">0 bps</span></div><input type="range" id="edge-gap-slider" min="0" max="40" value="0" oninput="updateKillSwitches()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Daily loss (vs &minus;$10k limit)</label><span class="val-badge" id="ks-dd-val">&minus;$1,000</span></div><input type="range" id="ks-dd-slider" min="0" max="20000" step="500" value="1000" oninput="updateKillSwitches()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Oracle / API divergence &amp; latency</label><span class="val-badge" id="api-val">40 ms</span></div><input type="range" id="api-slider" min="10" max="600" value="40" step="10" oninput="updateKillSwitches()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Inventory utilisation (vs 80% cap)</label><span class="val-badge" id="tox-ks-val">25%</span></div><input type="range" id="tox-ks-slider" min="0" max="100" value="25" oninput="updateKillSwitches()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Realised / expected edge gap</label><span class="val-badge" id="edge-gap-val">0 bps</span></div><input type="range" id="edge-gap-slider" min="0" max="11" value="0" oninput="updateKillSwitches()"></div>
         <div class="note"><span id="ks-msg" style="font-weight:800;color:var(--success);">System risk gates normal. Strategy activity permitted inside approved caps.</span></div>
       </div>
     </div>
@@ -727,13 +727,13 @@
 
   <div id="tab-multisig" class="tab-content">
     <h2>Treasury Multi-Sig Governance</h2>
-    <p>Trading systems cannot unilaterally move material treasury funds. Treasury, operating capital, Tier 1 risk capital and Tier 2 risk capital remain segregated.</p>
+    <p>Trading systems cannot unilaterally move material treasury funds. Treasury, operating capital, spread / MM risk capital and EV-model risk capital remain segregated.</p>
     <div class="grid-2">
       <div class="card">
         <h3>Approval Stage Track</h3>
         <div class="timeline">
           <div class="step active" id="ms-1"><strong>1. Transfer proposal</strong><p>Destination wallet / venue account must match internal whitelist. Status: unsigned.</p></div>
-          <div class="step" id="ms-2"><strong>2. Strategy and tier check</strong><p>Transfer amount must fit approved Tier 1, Tier 2 or experimental capital cap.</p></div>
+          <div class="step" id="ms-2"><strong>2. Strategy and tier check</strong><p>Transfer amount must fit the approved spread / MM, EV-model or experimental capital cap.</p></div>
           <div class="step" id="ms-3"><strong>3. Hardware key quorum</strong><p>2-of-3 signer threshold required for material treasury movement.</p></div>
           <div class="step" id="ms-4"><strong>4. Time-lock / veto window</strong><p>Time-lock allows manual intervention before transfer finalisation.</p><div id="timelock-display" style="display:none;font-family:var(--font-mono);font-size:1.1rem;color:var(--warning);border:1px solid var(--border-light);padding:2px 8px;border-radius:4px;margin-top:6px;">23:59:59</div></div>
           <div class="step" id="ms-5"><strong>5. Segregated trading account</strong><p>Funds land in trade-only accounts with restricted withdrawal permissions.</p></div>
@@ -759,7 +759,7 @@
 
   <div id="tab-pipeline" class="tab-content">
     <h2>Strategy Deployment Pipeline</h2>
-    <p>No model moves directly from backtest to meaningful capital deployment. Tier 1 and Tier 2 strategies must prove data quality, execution quality, controlled loss behaviour and repeatable edge.</p>
+    <p>No model moves directly from backtest to meaningful capital deployment. Spread / MM and EV-model strategies must prove data quality, execution quality, controlled loss behaviour and repeatable edge.</p>
     <div class="grid-2">
       <div class="card">
         <div class="timeline">
@@ -783,10 +783,10 @@
 
   <div id="tab-gauntlet" class="tab-content">
     <h2>Pre-Trade Risk Gate</h2>
-    <p>Each order candidate must pass data, liquidity, expected-edge and strategy-specific checks before execution. Tier 2 strategies add model and event-risk gates on top of standard venue controls.</p>
+    <p>Each order candidate must pass data, liquidity, expected-edge and strategy-specific checks before execution. EV-model strategies add model and event-risk gates on top of standard venue controls. The expected-edge gate defaults to the modelled <strong>11 bps net</strong> capture.</p>
     <div class="pill-row">
-      <button class="select-pill active" id="gate-mode-tier1" onclick="setGateMode('tier1')">Tier 1 · Market Making</button>
-      <button class="select-pill" id="gate-mode-tier2" onclick="setGateMode('tier2')">Tier 2 · Proprietary Alpha</button>
+      <button class="select-pill active" id="gate-mode-tier1" onclick="setGateMode('tier1')">Tier 1 · Spread / Market Making</button>
+      <button class="select-pill" id="gate-mode-tier2" onclick="setGateMode('tier2')">Tier 2 · Proprietary EV Models</button>
     </div>
     <div class="grid-2">
       <div class="card" style="display:flex;flex-direction:column;gap:0;">
@@ -799,7 +799,7 @@
       <div class="card">
         <h3>Risk Parameter Injector</h3>
         <div class="slider-group"><div class="slider-header"><label>Data freshness / latency</label><span class="val-badge" id="g-lat-val">20 ms</span></div><input type="range" id="g-lat" min="1" max="300" value="20" oninput="updateGauntlet()"></div>
-        <div class="slider-group"><div class="slider-header"><label>Expected net edge after costs</label><span class="val-badge" id="g-edge-val">6 bps</span></div><input type="range" id="g-edge" min="-10" max="40" value="6" oninput="updateGauntlet()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Expected net edge after costs</label><span class="val-badge" id="g-edge-val">11 bps</span></div><input type="range" id="g-edge" min="-10" max="40" value="11" oninput="updateGauntlet()"></div>
         <div class="slider-group"><div class="slider-header"><label>Adverse selection / liquidity risk</label><span class="val-badge" id="g-tox-val">20 / 100</span></div><input type="range" id="g-tox" min="0" max="100" value="20" oninput="updateGauntlet()"></div>
         <div class="slider-group"><div class="slider-header"><label id="g-special-label">Inventory concentration</label><span class="val-badge" id="g-special-val">20%</span></div><input type="range" id="g-special" min="0" max="100" value="20" oninput="updateGauntlet()"></div>
       </div>
@@ -807,20 +807,20 @@
   </div>
 
   <div id="tab-tier1" class="tab-content">
-    <h2>Tier 1 Market-Making Controls</h2>
-    <p>Tier 1 is controlled through inventory, quoting, adverse-selection and liquidity-risk controls. Gross volume is not the objective; risk-adjusted net capture is.</p>
+    <h2>Spread &amp; Market-Making Controls</h2>
+    <p>Tier 1 is controlled through inventory, quoting, adverse-selection and liquidity-risk controls. Gross volume is not the objective; risk-adjusted net capture is. Inventory is hard-capped at <strong>80%</strong> utilisation before quoting halts.</p>
     <div class="grid-2">
       <div class="card" style="height:300px;position:relative;"><canvas id="markoutChart"></canvas></div>
       <div class="card">
-        <h3>Adverse Flow & Inventory Simulator</h3>
+        <h3>Adverse Flow &amp; Inventory Simulator</h3>
         <div class="slider-group"><div class="slider-header"><label>Post-fill toxicity index</label><span class="val-badge" id="tier1-tox-val">15 / 100</span></div><input type="range" id="tier1-tox-slider" min="0" max="100" value="15" oninput="updateTier1()"></div>
-        <div class="slider-group"><div class="slider-header"><label>Inventory concentration</label><span class="val-badge" id="tier1-inv-val">25%</span></div><input type="range" id="tier1-inv-slider" min="0" max="100" value="25" oninput="updateTier1()"></div>
+        <div class="slider-group"><div class="slider-header"><label>Inventory concentration (cap 80%)</label><span class="val-badge" id="tier1-inv-val">25%</span></div><input type="range" id="tier1-inv-slider" min="0" max="100" value="25" oninput="updateTier1()"></div>
         <div class="note"><span class="status-dot bg-success" id="tier1-dot"></span><span id="tier1-msg">Flow benign. Quotes remain active inside normal limits.</span></div>
         <table style="margin-top:16px;">
           <thead><tr><th>Condition</th><th>Automated action</th></tr></thead>
           <tbody>
             <tr><td>Negative markout</td><td>Widen spreads, reduce size, increase expected-edge requirement.</td></tr>
-            <tr><td>Inventory build-up</td><td>Skew quotes, hedge, stop adding exposure.</td></tr>
+            <tr><td>Inventory &gt; 80%</td><td>Skew quotes, hedge, stop adding exposure.</td></tr>
             <tr><td>Liquidity deterioration</td><td>Pull quotes or move to one-sided / defensive quoting.</td></tr>
           </tbody>
         </table>
@@ -829,11 +829,11 @@
   </div>
 
   <div id="tab-tier2" class="tab-content">
-    <h2>Tier 2 Proprietary Alpha Controls</h2>
-    <p>Tier 2 strategies may involve model, event and directional risk. They require explicit hypothesis validation, liquidity checks, edge-decay monitoring and model retirement rules.</p>
+    <h2>Proprietary EV-Model Controls</h2>
+    <p>Tier 2 EV-model strategies may involve model, event and directional risk. They require explicit hypothesis validation, liquidity checks, edge-decay monitoring and model retirement rules.</p>
     <div class="grid-2">
       <div class="card">
-        <h3>Tier 2 Strategy Risk Checklist</h3>
+        <h3>EV-Model Strategy Risk Checklist</h3>
         <table>
           <thead><tr><th>Strategy</th><th>Primary Risk</th><th>Control</th></tr></thead>
           <tbody>
@@ -841,7 +841,6 @@
             <tr><td>Sports / event alpha</td><td>Model error, injuries, weather, event concentration.</td><td>Calibration review, event caps, Kelly haircuts.</td></tr>
             <tr><td>Computer vision</td><td>Data quality, spurious correlation, feature instability.</td><td>Human review, sample-size thresholds, feature tests.</td></tr>
             <tr><td>Wallet / flow classification</td><td>Misclassification of sharp vs consumer flow.</td><td>Recalibration, cluster review, markout validation.</td></tr>
-            <tr><td>Tokenised RWA dislocations</td><td>Reference-price failure, basis and funding risk.</td><td>Multi-source reference validation and funding checks.</td></tr>
           </tbody>
         </table>
       </div>
@@ -850,7 +849,7 @@
         <div class="slider-group"><div class="slider-header"><label>Model confidence</label><span class="val-badge" id="t2-conf-val">82%</span></div><input type="range" id="t2-conf-slider" min="0" max="100" value="82" oninput="updateTier2()"></div>
         <div class="slider-group"><div class="slider-header"><label>Edge decay from launch</label><span class="val-badge" id="t2-decay-val">15%</span></div><input type="range" id="t2-decay-slider" min="0" max="100" value="15" oninput="updateTier2()"></div>
         <div class="slider-group"><div class="slider-header"><label>Event / settlement ambiguity</label><span class="val-badge" id="t2-event-val">10 / 100</span></div><input type="range" id="t2-event-slider" min="0" max="100" value="10" oninput="updateTier2()"></div>
-        <div class="note"><span class="status-dot bg-success" id="t2-dot"></span><span id="t2-msg">Tier 2 strategy valid. Capital permitted inside approved cap.</span></div>
+        <div class="note"><span class="status-dot bg-success" id="t2-dot"></span><span id="t2-msg">EV model valid. Capital permitted inside approved cap.</span></div>
         <div style="height:180px;margin-top:18px;position:relative;"><canvas id="tier2Chart"></canvas></div>
       </div>
     </div>
@@ -861,16 +860,16 @@
     <div class="metric-row">
       <div class="metric-box"><div class="metric-title">Portfolio State</div><div class="metric-val val-success" id="mc-sys-state">ACTIVE</div><div class="metric-sub" id="mc-state-sub">All tiers inside limits</div></div>
       <div class="metric-box"><div class="metric-title">Active Trading Capital</div><div class="metric-val val-neutral" id="mc-active-cap">$250,000</div><div class="metric-sub">Initial trading envelope; $150k reserve protected</div></div>
-      <div class="metric-box"><div class="metric-title">Tier 1 Status</div><div class="metric-val val-tier1" id="mc-tier1">QUOTING</div><div class="metric-sub" id="mc-tier1-sub">Normal spread / inventory</div></div>
-      <div class="metric-box"><div class="metric-title">Tier 2 Status</div><div class="metric-val val-tier2" id="mc-tier2">VALID</div><div class="metric-sub" id="mc-tier2-sub">Signals inside confidence limits</div></div>
+      <div class="metric-box"><div class="metric-title">Spread / MM Status</div><div class="metric-val val-tier1" id="mc-tier1">QUOTING</div><div class="metric-sub" id="mc-tier1-sub">Normal spread / inventory</div></div>
+      <div class="metric-box"><div class="metric-title">EV Model Status</div><div class="metric-val val-tier2" id="mc-tier2">VALID</div><div class="metric-sub" id="mc-tier2-sub">Signals inside confidence limits</div></div>
     </div>
 
     <div class="grid-2">
       <div class="card">
         <h3 style="border-bottom:1px solid var(--border-light);padding-bottom:14px;margin-bottom:22px;">Live Portfolio Risk Metrics</h3>
         <div class="progress-row"><div class="progress-head"><span class="progress-label">Cross-tier event overlap</span><span class="progress-val" id="mc-overlap-val">Low</span></div><div class="track"><div class="fill" id="mc-overlap-bar" style="width:18%;background:var(--success);"></div></div></div>
-        <div class="progress-row"><div class="progress-head"><span class="progress-label">Tier 1 adverse selection</span><span class="progress-val" id="mc-tox-val">Benign</span></div><div class="track"><div class="fill" id="mc-tox-bar" style="width:15%;background:var(--success);"></div></div></div>
-        <div class="progress-row"><div class="progress-head"><span class="progress-label">Tier 2 model decay</span><span class="progress-val" id="mc-decay-val">Contained</span></div><div class="track"><div class="fill" id="mc-decay-bar" style="width:20%;background:var(--success);"></div></div></div>
+        <div class="progress-row"><div class="progress-head"><span class="progress-label">Spread / MM adverse selection</span><span class="progress-val" id="mc-tox-val">Benign</span></div><div class="track"><div class="fill" id="mc-tox-bar" style="width:15%;background:var(--success);"></div></div></div>
+        <div class="progress-row"><div class="progress-head"><span class="progress-label">EV-model edge decay</span><span class="progress-val" id="mc-decay-val">Contained</span></div><div class="track"><div class="fill" id="mc-decay-bar" style="width:20%;background:var(--success);"></div></div></div>
         <div class="progress-row"><div class="progress-head"><span class="progress-label">Venue/API latency</span><span class="progress-val" id="mc-lat-val">22 ms</span></div><div class="track"><div class="fill" id="mc-lat-bar" style="width:10%;background:var(--success);"></div></div></div>
       </div>
       <div class="card">
@@ -883,8 +882,8 @@
       <h3>Scenario Simulation Injector</h3>
       <div class="pill-row">
         <button class="scenario-btn active" id="btn-scen-normal" onclick="triggerScenario('normal')">Normal Cross-Tier Flow</button>
-        <button class="scenario-btn" id="btn-scen-toxic" onclick="triggerScenario('toxic')">Tier 1 Toxic Flow</button>
-        <button class="scenario-btn tier2" id="btn-scen-decay" onclick="triggerScenario('decay')">Tier 2 Edge Decay</button>
+        <button class="scenario-btn" id="btn-scen-toxic" onclick="triggerScenario('toxic')">Spread / MM Toxic Flow</button>
+        <button class="scenario-btn tier2" id="btn-scen-decay" onclick="triggerScenario('decay')">EV-Model Edge Decay</button>
         <button class="scenario-btn tier2" id="btn-scen-event" onclick="triggerScenario('event')">Event Settlement Shock</button>
         <button class="scenario-btn" id="btn-scen-api" onclick="triggerScenario('api')">Venue/API Degradation</button>
         <button class="scenario-btn danger" id="btn-scen-flash" onclick="triggerScenario('flash')">Portfolio Flash Crash</button>
@@ -911,26 +910,26 @@
       const mode = document.getElementById('mode-pill');
       display.innerText = globalScore + '%';
       if (globalScore > 80) {
-        display.style.color = 'var(--success)';
-        display.style.textShadow = '0 0 15px var(--success-glow)';
+        display.style.color = 'var(--pos)';
+        display.style.textShadow = 'none';
         mode.innerText = 'Risk-Gated Deployment';
-        mode.style.color = 'var(--success)';
-        mode.style.borderColor = 'rgba(16,185,129,.35)';
-        mode.style.background = 'rgba(16,185,129,.12)';
+        mode.style.color = 'var(--pos)';
+        mode.style.borderColor = 'rgba(63,135,101,.35)';
+        mode.style.background = 'rgba(63,135,101,.10)';
       } else if (globalScore > 50) {
-        display.style.color = 'var(--warning)';
-        display.style.textShadow = '0 0 15px var(--warning-glow)';
+        display.style.color = 'var(--gold)';
+        display.style.textShadow = 'none';
         mode.innerText = 'Defensive Mode';
-        mode.style.color = 'var(--warning)';
-        mode.style.borderColor = 'rgba(245,158,11,.35)';
-        mode.style.background = 'rgba(245,158,11,.12)';
+        mode.style.color = 'var(--gold)';
+        mode.style.borderColor = 'rgba(181,137,61,.35)';
+        mode.style.background = 'rgba(181,137,61,.10)';
       } else {
-        display.style.color = 'var(--danger)';
-        display.style.textShadow = '0 0 15px var(--danger-glow)';
+        display.style.color = 'var(--neg)';
+        display.style.textShadow = 'none';
         mode.innerText = 'Trading Restricted';
-        mode.style.color = 'var(--danger)';
-        mode.style.borderColor = 'rgba(239,68,68,.35)';
-        mode.style.background = 'rgba(239,68,68,.12)';
+        mode.style.color = 'var(--neg)';
+        mode.style.borderColor = 'rgba(177,75,58,.35)';
+        mode.style.background = 'rgba(177,75,58,.10)';
       }
     }
 
@@ -970,11 +969,11 @@
         dot = 'bg-danger';
         score = 20;
       } else if (haircut >= 60) {
-        msg = 'Tier 2 signal confidence materially reduced. Tier 2 deployment blocked; $250k active capital remains available for Tier 1 market making only.';
+        msg = 'EV-model signal confidence materially reduced. EV deployment blocked; $250k active capital remains available for spread / market making only.';
         dot = 'bg-warning';
         score = 78 - haircut * 0.2;
       } else if (haircut > 0) {
-        msg = 'Tier 2 confidence haircut applied inside the $250k active trading envelope. No automatic scale-up permitted.';
+        msg = 'EV-model confidence haircut applied inside the $250k active trading envelope. No automatic scale-up permitted.';
         dot = 'bg-success';
         score = 100 - haircut * 0.15;
       }
@@ -989,13 +988,18 @@
     }
 
     function updateKillSwitches() {
-      const dd = parseFloat(document.getElementById('ks-dd-slider').value);
-      const api = parseInt(document.getElementById('api-slider').value);
-      const tox = parseInt(document.getElementById('tox-ks-slider').value);
-      const edgeGap = parseInt(document.getElementById('edge-gap-slider').value);
-      document.getElementById('ks-dd-val').innerText = dd.toFixed(1) + '%';
+      // Thresholds tied to the model Edge Bridge:
+      //   daily loss hard stop  = -$10,000
+      //   oracle/latency hard    = >200ms (and 2% divergence, represented on same axis)
+      //   inventory hard cap     = 80%
+      //   edge gap               = realised-vs-expected vs 11 bps modelled net
+      const loss = parseInt(document.getElementById('ks-dd-slider').value);     // dollars of daily loss
+      const api = parseInt(document.getElementById('api-slider').value);         // ms
+      const inv = parseInt(document.getElementById('tox-ks-slider').value);      // % inventory utilisation
+      const edgeGap = parseInt(document.getElementById('edge-gap-slider').value);// bps gap vs 11bps
+      document.getElementById('ks-dd-val').innerText = '\u2212$' + loss.toLocaleString('en-US');
       document.getElementById('api-val').innerText = api + ' ms';
-      document.getElementById('tox-ks-val').innerText = tox + ' / 100';
+      document.getElementById('tox-ks-val').innerText = inv + '%';
       document.getElementById('edge-gap-val').innerText = edgeGap + ' bps';
 
       for (let i = 1; i <= 4; i++) {
@@ -1004,24 +1008,28 @@
       }
 
       let msg = 'System risk gates normal. Strategy activity permitted inside approved caps.';
-      let color = 'var(--success)';
+      let color = 'var(--pos)';
       let score = 100;
       let hard = false;
 
-      if (dd >= 8) { document.getElementById('ks-1').className = 'status-dot bg-danger'; document.getElementById('card-ks-1').style.borderColor = 'var(--danger)'; hard = true; }
-      else if (dd >= 4) { document.getElementById('ks-1').className = 'status-dot bg-warning'; score = Math.min(score, 70); }
+      // Daily loss vs -$10k hard / -$6k warning
+      if (loss >= 10000) { document.getElementById('ks-1').className = 'status-dot bg-danger'; document.getElementById('card-ks-1').style.borderColor = 'var(--danger)'; hard = true; }
+      else if (loss >= 6000) { document.getElementById('ks-1').className = 'status-dot bg-warning'; score = Math.min(score, 70); }
 
-      if (api > 500) { document.getElementById('ks-2').className = 'status-dot bg-danger'; document.getElementById('card-ks-2').style.borderColor = 'var(--danger)'; hard = true; }
-      else if (api > 200) { document.getElementById('ks-2').className = 'status-dot bg-warning'; score = Math.min(score, 70); }
+      // Oracle / API divergence: >200ms hard, >120ms warning
+      if (api > 200) { document.getElementById('ks-2').className = 'status-dot bg-danger'; document.getElementById('card-ks-2').style.borderColor = 'var(--danger)'; hard = true; }
+      else if (api > 120) { document.getElementById('ks-2').className = 'status-dot bg-warning'; score = Math.min(score, 70); }
 
-      if (tox > 75) { document.getElementById('ks-3').className = 'status-dot bg-danger'; document.getElementById('card-ks-3').style.borderColor = 'var(--danger)'; score = Math.min(score, 35); }
-      else if (tox > 45) { document.getElementById('ks-3').className = 'status-dot bg-warning'; score = Math.min(score, 72); }
+      // Inventory: >=80% hard cap, >60% warning
+      if (inv >= 80) { document.getElementById('ks-3').className = 'status-dot bg-danger'; document.getElementById('card-ks-3').style.borderColor = 'var(--danger)'; score = Math.min(score, 35); hard = true; }
+      else if (inv > 60) { document.getElementById('ks-3').className = 'status-dot bg-warning'; score = Math.min(score, 72); }
 
-      if (edgeGap > 25) { document.getElementById('ks-4').className = 'status-dot bg-danger'; document.getElementById('card-ks-4').style.borderColor = 'var(--danger)'; score = Math.min(score, 38); }
-      else if (edgeGap > 10) { document.getElementById('ks-4').className = 'status-dot bg-warning'; score = Math.min(score, 74); }
+      // Edge gap vs 11 bps modelled net: a gap of the full 11bps means realised edge gone
+      if (edgeGap >= 9) { document.getElementById('ks-4').className = 'status-dot bg-danger'; document.getElementById('card-ks-4').style.borderColor = 'var(--danger)'; score = Math.min(score, 38); }
+      else if (edgeGap >= 5) { document.getElementById('ks-4').className = 'status-dot bg-warning'; score = Math.min(score, 74); }
 
-      if (hard) { msg = 'CRITICAL BOUNDARY BREACHED. Portfolio kill-switch engaged. Halt trading and require manual review.'; color = 'var(--danger)'; score = 15; }
-      else if (score < 80) { msg = 'Defensive mode. Reduce size, widen quotes, pause affected Tier 2 signals and monitor exposure aggregation.'; color = 'var(--warning)'; }
+      if (hard) { msg = 'CRITICAL BOUNDARY BREACHED. Portfolio kill-switch engaged. Halt trading and require manual review.'; color = 'var(--neg)'; score = 15; }
+      else if (score < 80) { msg = 'Defensive mode. Reduce size, widen quotes, pause affected EV-model signals and monitor exposure aggregation.'; color = 'var(--gold)'; }
 
       const el = document.getElementById('ks-msg');
       el.innerText = msg;
@@ -1104,7 +1112,6 @@
       document.getElementById('gate-mode-tier1').classList.toggle('active', mode === 'tier1');
       document.getElementById('gate-mode-tier2').classList.toggle('active', mode === 'tier2');
       const label = document.getElementById('g-special-label');
-      const val = document.getElementById('g-special-val');
       if (mode === 'tier1') {
         label.innerText = 'Inventory concentration';
       } else {
@@ -1129,7 +1136,7 @@
       if (lat > 100) { layers[0].style.background = 'var(--danger)'; failed = true; reason = 'TRADE BLOCKED · STALE / SLOW DATA'; }
       if (edge <= 0) { layers[1].style.background = 'var(--danger)'; failed = true; reason = 'TRADE BLOCKED · EDGE AFTER COSTS <= 0'; }
       if (tox > 70) { layers[2].style.background = 'var(--danger)'; failed = true; reason = 'TRADE BLOCKED · ADVERSE SELECTION / LIQUIDITY RISK'; }
-      if (special > (currentGateMode === 'tier1' ? 75 : 65)) { layers[3].style.background = 'var(--danger)'; failed = true; reason = currentGateMode === 'tier1' ? 'TRADE BLOCKED · INVENTORY LIMIT' : 'TRADE BLOCKED · MODEL / EVENT RISK'; }
+      if (special > (currentGateMode === 'tier1' ? 80 : 65)) { layers[3].style.background = 'var(--danger)'; failed = true; reason = currentGateMode === 'tier1' ? 'TRADE BLOCKED · INVENTORY LIMIT' : 'TRADE BLOCKED · MODEL / EVENT RISK'; }
       const res = document.getElementById('g-result');
       res.innerText = reason;
       res.style.color = failed ? 'var(--danger)' : 'var(--success)';
@@ -1142,7 +1149,7 @@
       Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
       markoutChart = new Chart(ctx, {
         type: 'line',
-        data: { labels: ['0ms','100ms','1s','5s','60s'], datasets: [{ label: 'Post-fill markout (bps)', data: [0,1,1.5,2,2], borderColor:'#3F8765', borderWidth:3, tension:.3, fill:true, backgroundColor:'rgba(16,185,129,.1)' }] },
+        data: { labels: ['0ms','100ms','1s','5s','60s'], datasets: [{ label: 'Post-fill markout (bps)', data: [0,1,1.5,2,2], borderColor:'#3F8765', borderWidth:3, tension:.3, fill:true, backgroundColor:'rgba(63,135,101,.10)' }] },
         options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{min:-18,max:6,grid:{color:'rgba(22,32,46,0.14)'}}, x:{grid:{color:'rgba(22,32,46,0.14)'}} } }
       });
     }
@@ -1155,11 +1162,11 @@
       document.getElementById('tier1-inv-val').innerText = inv + '%';
       let data, color, bg, msg, dot, score;
       if (tox < 40 && inv < 60) {
-        data = [0,1,1.5,2,2]; color='#3F8765'; bg='rgba(16,185,129,.1)'; msg='Flow benign. Quotes remain active inside normal limits.'; dot='bg-success'; score=100;
-      } else if (tox < 75 && inv < 85) {
-        data = [0,-2,-4,-1,1]; color='#B5893D'; bg='rgba(245,158,11,.1)'; msg='Defensive mode. Widen quotes, reduce size and skew away from inventory.'; dot='bg-warning'; score=70;
+        data = [0,1,1.5,2,2]; color='#3F8765'; bg='rgba(63,135,101,.10)'; msg='Flow benign. Quotes remain active inside normal limits.'; dot='bg-success'; score=100;
+      } else if (tox < 75 && inv < 80) {
+        data = [0,-2,-4,-1,1]; color='#B5893D'; bg='rgba(181,137,61,.10)'; msg='Defensive mode. Widen quotes, reduce size and skew away from inventory.'; dot='bg-warning'; score=70;
       } else {
-        data = [0,-6,-10,-12,-15]; color='#B14B3A'; bg='rgba(239,68,68,.1)'; msg='Tier 1 risk breach. Pause quoting and prioritise exposure reduction.'; dot='bg-danger'; score=32;
+        data = [0,-6,-10,-12,-15]; color='#B14B3A'; bg='rgba(177,75,58,.10)'; msg='Risk breach. Inventory at/above 80% cap — pause quoting and prioritise exposure reduction.'; dot='bg-danger'; score=32;
       }
       markoutChart.data.datasets[0].data = data;
       markoutChart.data.datasets[0].borderColor = color;
@@ -1174,8 +1181,8 @@
       const ctx = document.getElementById('tier2Chart').getContext('2d');
       tier2Chart = new Chart(ctx, {
         type: 'bar',
-        data: { labels:['Expected','Realised','Liquidity','Confidence'], datasets:[{ data:[10,8,7,8.2], backgroundColor:['#2E5AAC','#B5893D','#AFB6BF','#3F8765'], borderRadius:4 }] },
-        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{min:0,max:12,grid:{color:'rgba(22,32,46,0.14)'}, ticks:{callback:v => v + ' bps'}}, x:{grid:{display:false}} } }
+        data: { labels:['Expected','Realised','Liquidity','Confidence'], datasets:[{ data:[11,9,7,8.2], backgroundColor:['#2E5AAC','#B5893D','#AFB6BF','#3F8765'], borderRadius:4 }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{min:0,max:14,grid:{color:'rgba(22,32,46,0.14)'}, ticks:{callback:v => v + ' bps'}}, x:{grid:{display:false}} } }
       });
     }
 
@@ -1187,19 +1194,19 @@
       document.getElementById('t2-conf-val').innerText = conf + '%';
       document.getElementById('t2-decay-val').innerText = decay + '%';
       document.getElementById('t2-event-val').innerText = event + ' / 100';
-      const realised = Math.max(0, 10 * (conf / 100) * (1 - decay / 100) - event / 20);
+      const realised = Math.max(0, 11 * (conf / 100) * (1 - decay / 100) - event / 20);
       const liquidity = Math.max(0, 9 - event / 18);
-      tier2Chart.data.datasets[0].data = [10, realised, liquidity, conf / 10];
+      tier2Chart.data.datasets[0].data = [11, realised, liquidity, conf / 10];
       tier2Chart.update();
-      let msg = 'Tier 2 strategy valid. Capital permitted inside approved cap.';
+      let msg = 'EV model valid. Capital permitted inside approved cap.';
       let dot = 'bg-success';
       let score = 100;
       if (conf < 55 || decay > 55 || event > 60) {
-        msg = 'Tier 2 risk breach. Pause or reduce strategy; require model review before scaling.';
+        msg = 'EV-model risk breach. Pause or reduce strategy; require model review before scaling.';
         dot = 'bg-danger';
         score = 38;
       } else if (conf < 70 || decay > 35 || event > 35) {
-        msg = 'Tier 2 caution. Reduce capital cap, demand higher expected edge and monitor markouts.';
+        msg = 'EV-model caution. Reduce capital cap, demand higher expected edge and monitor markouts.';
         dot = 'bg-warning';
         score = 72;
       }
@@ -1213,11 +1220,11 @@
       if (!box) return;
       const now = new Date();
       const time = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}.${String(now.getMilliseconds()).padStart(3,'0')}]`;
-      let color = 'var(--text-primary)';
-      if (type === 'warn') color = 'var(--warning)';
-      if (type === 'danger') color = 'var(--danger)';
-      if (type === 'tier2') color = 'var(--tier2)';
-      if (type === 'tier1') color = 'var(--tier1)';
+      let color = 'var(--cream)';
+      if (type === 'warn') color = 'var(--gold)';
+      if (type === 'danger') color = 'var(--neg)';
+      if (type === 'tier2') color = 'var(--gold)';
+      if (type === 'tier1') color = 'var(--accent-blue-light)';
       const div = document.createElement('div');
       div.style.marginBottom = '2px';
       div.innerHTML = `<span class="log-time">${time}</span><span style="color:${color};">${msg}</span>`;
@@ -1256,8 +1263,8 @@
         setGlobalScore(100);
         logInterval = setInterval(() => {
           const samples = [
-            ['TIER1_MM: fill received; post-fill markout positive at 1000ms', 'tier1'],
-            ['TIER2_ALPHA: price-lag candidate passed liquidity and edge gates', 'tier2'],
+            ['SPREAD_MM: fill received; post-fill markout positive at 1000ms', 'tier1'],
+            ['EV_MODEL: price-lag candidate passed liquidity and edge gates', 'tier2'],
             ['RISK_ENGINE: cross-tier exposure inside event and venue limits', 'info'],
             ['RECON: venue fills matched internal ledger state', 'info']
           ];
@@ -1265,7 +1272,7 @@
         }, 1450);
       }
       else if (type === 'toxic') {
-        state.innerText = 'DEFENSIVE'; state.className = 'metric-val val-warning'; stateSub.innerText = 'Tier 1 liquidity reduced';
+        state.innerText = 'DEFENSIVE'; state.className = 'metric-val val-warning'; stateSub.innerText = 'Spread / MM liquidity reduced';
         cap.innerText = '$185,000'; cap.className = 'metric-val val-neutral';
         t1.innerText = 'WIDENING'; t1.className = 'metric-val val-warning'; t1Sub.innerText = 'Toxic flow detected';
         t2.innerText = 'VALID'; t2.className = 'metric-val val-tier2'; t2Sub.innerText = 'No shared exposure breach';
@@ -1274,12 +1281,12 @@
         setMeter('mc-decay-bar',20,'var(--success)','mc-decay-val','Contained');
         setMeter('mc-lat-bar',12,'var(--success)','mc-lat-val','26 ms');
         setGlobalScore(72);
-        addLog('TIER1_MM: negative markout cluster detected after taker fills', 'warn');
+        addLog('SPREAD_MM: negative markout cluster detected after taker fills', 'warn');
         addLog('ACTION: widen quotes, reduce order size, raise expected-edge threshold', 'info');
-        logInterval = setInterval(() => addLog('TIER1_MM: hostile flow blocked by defensive quoting barrier', 'tier1'), 1800);
+        logInterval = setInterval(() => addLog('SPREAD_MM: hostile flow blocked by defensive quoting barrier', 'tier1'), 1800);
       }
       else if (type === 'decay') {
-        state.innerText = 'DEFENSIVE'; state.className = 'metric-val val-warning'; stateSub.innerText = 'Tier 2 capital capped';
+        state.innerText = 'DEFENSIVE'; state.className = 'metric-val val-warning'; stateSub.innerText = 'EV-model capital capped';
         cap.innerText = '$250,000'; cap.className = 'metric-val val-neutral';
         t1.innerText = 'QUOTING'; t1.className = 'metric-val val-tier1'; t1Sub.innerText = 'Normal spread / inventory';
         t2.innerText = 'PAUSED'; t2.className = 'metric-val val-warning'; t2Sub.innerText = 'Edge decay threshold crossed';
@@ -1288,8 +1295,8 @@
         setMeter('mc-decay-bar',92,'var(--warning)','mc-decay-val','Edge decay');
         setMeter('mc-lat-bar',10,'var(--success)','mc-lat-val','20 ms');
         setGlobalScore(68);
-        addLog('TIER2_ALPHA: realised markouts below expected after fees and slippage', 'tier2');
-        addLog('ACTION: pause affected alpha model; require research review before scaling', 'warn');
+        addLog('EV_MODEL: realised markouts below the modelled 11 bps net after fees and slippage', 'tier2');
+        addLog('ACTION: pause affected EV model; require research review before scaling', 'warn');
         logInterval = setInterval(() => addLog('MODEL_RISK: monitoring live-vs-expected markout divergence', 'tier2'), 2000);
       }
       else if (type === 'event') {
@@ -1303,7 +1310,7 @@
         setMeter('mc-lat-bar',15,'var(--success)','mc-lat-val','32 ms');
         setGlobalScore(55);
         addLog('EVENT_RISK: settlement rule ambiguity detected for active market', 'warn');
-        addLog('ACTION: halt new Tier 2 positions; aggregate same-event exposure', 'danger');
+        addLog('ACTION: halt new EV-model positions; aggregate same-event exposure', 'danger');
         logInterval = setInterval(() => addLog('GOVERNANCE: awaiting manual review for ambiguous event resolution', 'warn'), 2100);
       }
       else if (type === 'api') {
@@ -1314,9 +1321,9 @@
         setMeter('mc-overlap-bar',20,'var(--success)','mc-overlap-val','Low');
         setMeter('mc-tox-bar',20,'var(--success)','mc-tox-val','Benign');
         setMeter('mc-decay-bar',25,'var(--success)','mc-decay-val','Contained');
-        setMeter('mc-lat-bar',96,'var(--danger)','mc-lat-val','620 ms');
+        setMeter('mc-lat-bar',96,'var(--danger)','mc-lat-val','410 ms');
         setGlobalScore(58);
-        addLog('API_GATEWAY: latency jitter > 500ms; freshness gate failed', 'warn');
+        addLog('API_GATEWAY: latency jitter > 200ms; freshness gate failed', 'warn');
         addLog('ACTION: cancel resting orders; block new orders on degraded venue', 'danger');
         logInterval = setInterval(() => addLog('DATA_GATE: stale market frame dropped before strategy evaluation', 'warn'), 1700);
       }
@@ -1330,7 +1337,7 @@
         setMeter('mc-decay-bar',100,'var(--danger)','mc-decay-val','Invalid');
         setMeter('mc-lat-bar',100,'var(--danger)','mc-lat-val','Gateway timeout');
         setGlobalScore(12);
-        addLog('CRITICAL: portfolio volatility / drawdown boundary breached', 'danger');
+        addLog('CRITICAL: portfolio breached the \u2212$10,000 daily-loss boundary', 'danger');
         addLog('ACTION: mass-cancel resting orders and block new strategy candidates', 'danger');
         addLog('ACTION: migrate automated trading capital back to reserve tier', 'danger');
         addLog('SYSTEM: manual founder / board review required before restart', 'danger');
